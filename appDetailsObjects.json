@@ -1,0 +1,175 @@
+{
+ "20": {
+  "success": bool,
+  "data": {
+   "type": "game/software",
+   "name": "gamename",
+   "steam_appid": int,
+   "required_age": int,
+   "is_free": bool,
+   "detailed_description": "str",
+   "about_the_game": "str",
+   "short_description": "str",
+   "supported_languages": "str of languages",
+   "header_image": "str link",
+   "capsule_image": "str link",
+   "capsule_imagev5": "str link",
+   "website": null,
+   "pc_requirements": {
+    "minimum": "str requirements"
+   },
+   "mac_requirements": {
+    "minimum": "str requirements"
+   },
+   "linux_requirements": {
+    "minimum": "str requirements"
+   },
+   "developers": [
+    "str developer name"
+   ],
+   "publishers": [
+    "str publisher name"
+   ],
+   "price_overview": {
+    "currency": "str currency",
+    "initial": int,
+    "final": int,
+    "discount_percent": int,
+    "initial_formatted": "",
+    "final_formatted": "str currency final value"
+   },
+   "packages": [
+    int
+   ],
+   "package_groups": [
+    {
+     "name": "str",
+     "title": "str",
+     "description": "",
+     "selection_text": "str",
+     "save_text": "",
+     "display_type": 0,
+     "is_recurring_subscription": "str bool",
+     "subs": [
+      {
+       "packageid": 29,
+       "percent_savings_text": " ",
+       "percent_savings": 0,
+       "option_text": "Team Fortress Classic - $4.99",
+       "option_description": "",
+       "can_get_free_license": "0",
+       "is_free_license": false,
+       "price_in_cents_with_discount": 499
+      }
+     ]
+    }
+   ],
+   "platforms": {
+    "windows": true,
+    "mac": true,
+    "linux": true
+   },
+   "categories": [
+    {
+     "id": 1,
+     "description": "Multi-player"
+    },
+    {
+     "id": 49,
+     "description": "PvP"
+    },
+    {
+     "id": 36,
+     "description": "Online PvP"
+    },
+    {
+     "id": 37,
+     "description": "Shared/Split Screen PvP"
+    },
+    {
+     "id": 8,
+     "description": "Valve Anti-Cheat enabled"
+    },
+    {
+     "id": 44,
+     "description": "Remote Play Together"
+    },
+    {
+     "id": 62,
+     "description": "Family Sharing"
+    }
+   ],
+   "genres": [
+    {
+     "id": "1",
+     "description": "Action"
+    }
+   ],
+   "screenshots": [
+    {
+     "id": 0,
+     "path_thumbnail": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000164.600x338.jpg?t=1729702194",
+     "path_full": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000164.1920x1080.jpg?t=1729702194"
+    },
+    {
+     "id": 1,
+     "path_thumbnail": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000165.600x338.jpg?t=1729702194",
+     "path_full": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000165.1920x1080.jpg?t=1729702194"
+    },
+    {
+     "id": 2,
+     "path_thumbnail": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000166.600x338.jpg?t=1729702194",
+     "path_full": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000166.1920x1080.jpg?t=1729702194"
+    },
+    {
+     "id": 3,
+     "path_thumbnail": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000167.600x338.jpg?t=1729702194",
+     "path_full": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000167.1920x1080.jpg?t=1729702194"
+    },
+    {
+     "id": 4,
+     "path_thumbnail": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000168.600x338.jpg?t=1729702194",
+     "path_full": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/20/0000000168.1920x1080.jpg?t=1729702194"
+    }
+   ],
+   "recommendations": {
+    "total": 6511
+   },
+   "release_date": {
+    "coming_soon": false,
+    "date": "Apr 1, 1999"
+   },
+   "support_info": {
+    "url": "",
+    "email": ""
+   },
+   "background": "https://store.akamai.steamstatic.com/images/storepagebackground/app/20?t=1729702194",
+   "background_raw": "https://store.akamai.steamstatic.com/images/storepagebackground/app/20?t=1729702194",
+   "content_descriptors": {
+    "ids": [
+     2,
+     5
+    ],
+    "notes": "Includes intense violence and blood."
+   },
+   "ratings": {
+    "dejus": {
+     "rating_generated": "1",
+     "rating": "10",
+     "required_age": "10",
+     "banned": "0",
+     "use_age_gate": "0",
+     "descriptors": "Viol\u00eancia"
+    },
+    "steam_germany": {
+     "rating_generated": "1",
+     "rating": "12",
+     "required_age": "12",
+     "banned": "0",
+     "use_age_gate": "0",
+     "descriptors": "Gewalt"
+    }
+   }
+  }
+ }
+}
