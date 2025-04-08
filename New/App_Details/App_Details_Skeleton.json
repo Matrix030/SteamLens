@@ -1,0 +1,205 @@
+{
+ "1091500": {
+  "success": true,
+  "data": {
+   "type": "",
+   "name": "",
+   "steam_appid": 1091500,
+   "required_age": "",
+   "is_free": false,
+   "controller_support": "",
+   "dlc": [],
+   "detailed_description": "",
+   "about_the_game": "",
+   "short_description": "",
+   "header_image": "",
+   "website": "",
+   "pc_requirements": {
+    "minimum": "",
+    "recommended": ""
+   },
+   "mac_requirements": {
+    "minimum": "",
+    "recommended": ""
+   },
+   "linux_requirements": {
+    "minimum": "",
+    "recommended": ""
+   },
+   "legal_notice": "",
+   "developers": [""],
+   "publishers": [""],
+   "price_overview": {
+    "currency": "",
+    "initial": 0,
+    "final": 0,
+    "discount_percent": 0,
+    "initial_formatted": "",
+    "final_formatted": ""
+   },
+   "packages": [],
+   "package_groups": [
+    {
+     "name": "",
+     "title": "",
+     "description": "",
+     "selection_text": "",
+     "save_text": "",
+     "display_type": 0,
+     "is_recurring_subscription": "",
+     "subs": [
+      {
+       "packageid": 0,
+       "percent_savings_text": "",
+       "percent_savings": 0,
+       "option_text": "",
+       "option_description": "",
+       "can_get_free_license": "",
+       "is_free_license": false,
+       "price_in_cents_with_discount": 0
+      }
+     ]
+    }
+   ],
+   "platforms": {
+    "windows": false,
+    "mac": false,
+    "linux": false
+   },
+   "metacritic": {
+    "score": 0,
+    "url": ""
+   },
+   "categories": [
+    {
+     "id": 0,
+     "description": ""
+    }
+   ],
+   "genres": [
+    {
+     "id": "",
+     "description": ""
+    }
+   ],
+   "screenshots": [
+    {
+     "id": 0,
+     "path_thumbnail": "",
+     "path_full": ""
+    }
+   ],
+   "movies": [
+    {
+     "id": 0,
+     "name": "",
+     "thumbnail": "",
+     "webm": {
+      "480": "",
+      "max": ""
+     },
+     "mp4": {
+      "480": "",
+      "max": ""
+     },
+     "highlight": false
+    }
+   ],
+   "recommendations": {
+    "total": 0
+   },
+   "achievements": {
+    "total": 0,
+    "highlighted": [
+     {
+      "name": "",
+      "path": ""
+     }
+    ]
+   },
+   "release_date": {
+    "coming_soon": false,
+    "date": ""
+   },
+   "support_info": {
+    "url": "",
+    "email": ""
+   },
+   "background": "",
+   "background_raw": "",
+   "content_descriptors": {
+    "ids": [],
+    "notes": ""
+   },
+   
+   "ratings": {
+    "esrb": {
+     "rating": "",
+     "descriptors": "",
+     "required_age": "",
+     "use_age_gate": ""
+    },
+    "pegi": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "oflc": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "nzoflc": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "kgrb": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "dejus": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "mda": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "csrr": {
+     "rating": "",
+     "descriptors": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "crl": {
+     "rating": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "usk": {
+     "rating": "",
+     "use_age_gate": "",
+     "required_age": ""
+    },
+    "steam_germany": {
+     "rating_generated": "",
+     "rating": "",
+     "required_age": "",
+     "banned": "",
+     "use_age_gate": "",
+     "descriptors": ""
+    }
+   }
+  }
+ }
+}
