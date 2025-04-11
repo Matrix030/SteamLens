@@ -5,7 +5,7 @@ import os
 # Config
 log_file_path = r"../App_Details/steam_app_scraper.log"  # Replace with actual path
 target_phrase = "Processing appID:"
-target_pid = 26744  # Replace with the actual PID of the process to kill
+target_pid = 17332  # Replace with the actual PID of the process to kill
 
 def monitor_log_and_kill():
     print(f"Watching log: {log_file_path}")

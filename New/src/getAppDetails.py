@@ -220,9 +220,9 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
         with open(Review_Detail_json, 'w') as file:
             json.dump(app_details_final, file, indent=1)
         
-        # Clean up the rt_data file since processing is complete
-        if os.path.exists(rt_data_file):
-            os.remove(rt_data_file)
+        # # Clean up the rt_data file since processing is complete
+        # if os.path.exists(rt_data_file):
+        #     os.remove(rt_data_file)
             
         logging.info(f"Successfully processed appID: {appID}")
         return "success"
