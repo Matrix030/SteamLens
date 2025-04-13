@@ -5,9 +5,21 @@ import os
 # Config
 log_file_path = r"../App_Details/steam_app_scraper.log"  # Replace with actual path
 target_phrase = "Processing appID:"
-target_pid = 17332  # Replace with the actual PID of the process to kill
 
-def monitor_log_and_kill():
+
+def get_pid_by_name(name):
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            cmdline = proc.info.get('cmdline') or []
+            if name.lower() in (proc.info['name'] or "").lower() or \
+               any(name.lower() in cmd.lower() for cmd in cmdline):
+                return proc.info['pid']
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+    return None
+
+
+def monitor_log_and_kill(target_pid):
     print(f"Watching log: {log_file_path}")
     try:
         with open(log_file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -32,4 +44,10 @@ def monitor_log_and_kill():
     except Exception as e:
         print(f"Error: {e}")
 
-monitor_log_and_kill()
+if __name__ == "__main__":
+    pid = get_pid_by_name("steammongo")  # Replace with your target process keyword
+    if pid:
+        print(f"Found PID: {pid}")
+    else:
+        print("Process not found.")
+    monitor_log_and_kill(pid)
