@@ -1,16 +1,7 @@
 import os
 
 def clean_directories(base_path, log_file='non_empty_dirs.txt', action_log='log.txt', dry_run=True):
-    """
-    Walks through all directories under base_path.
-    Deletes empty directories and logs non-empty ones.
-    
-    Parameters:
-    - base_path (str): The path to begin the directory check.
-    - log_file (str): File to log non-empty directories.
-    - action_log (str): File to log all actions taken.
-    - dry_run (bool): If True, simulate actions without deleting.
-    """
+
     with open(log_file, 'w') as non_empty_log, open(action_log, 'w') as action_log_f:
         for root, dirs, files in os.walk(base_path, topdown=False):
             for dir_name in dirs:
@@ -37,6 +28,6 @@ print(f"You're about to scan and clean: {base_path}")
 proceed = input("Proceed? This may delete empty folders. Type 'YES' to continue: ")
 
 if proceed == 'YES':
-    clean_directories(base_path, dry_run=False)  # Set dry_run=False to enable deletion
+    clean_directories(base_path, dry_run=False)  
 else:
     print("Operation cancelled.")
