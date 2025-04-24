@@ -45,7 +45,7 @@ def monitor_log_and_kill(target_pid):
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    pid = get_pid_by_name("steammongo")  # Replace with your target process keyword
+    pid = get_pid_by_name("getAppDetails.py")  # Replace with your target process keyword
     if pid:
         print(f"Found PID: {pid}")
     else:
