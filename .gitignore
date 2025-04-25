@@ -1,1 +1,3 @@
 src/parquet_output
+src/review_lengths.txt
+src/all_files.parquet
