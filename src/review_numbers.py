@@ -36,7 +36,7 @@ if __name__ == "__main__":
             info = get_json(app_id)
             total_reviews = review_length(info, app_id)
             with open("review_lengths.txt", 'a') as file:
-                file.write(f'Total reviews for appId {app_id}: {total_reviews}\n')
+                file.write(f'{app_id}: {total_reviews}\n')
             total_reviews_all += total_reviews
         except FileNotFoundError:
             print(f"File for appId {app_id} not found, skipping.")
