@@ -3,7 +3,7 @@ import psutil
 import os
 
 # Config
-log_file_path = r"../App_Details/steam_app_scraper.log"  # Replace with actual path
+log_file_path = r"../app_details_json/steam_app_scraper.log"  # Replace with actual path
 target_phrase = "Processing appID:"
 
 

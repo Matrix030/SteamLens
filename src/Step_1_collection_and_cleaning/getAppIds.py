@@ -27,7 +27,7 @@ def get_sorted_steam_app_ids():
             sorted_data = {"applist": {"apps": sorted_apps}}
             
             # Save to a JSON file
-            with open('../appIdData/sorted_steam_apps.json', 'w') as f:
+            with open('../appList/sorted_steam_apps.json', 'w') as f:
                 json.dump(sorted_data, f, indent=4)
             
             print(f"Total number of appids: {total_count}")

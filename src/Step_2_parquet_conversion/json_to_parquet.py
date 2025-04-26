@@ -7,7 +7,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 def get_directory(app_id):
-    path = f'../App_Details/{app_id}_data/Review_Details{app_id}.json'
+    path = f'../../app_details_json/{app_id}_data/Review_Details{app_id}.json'
     print(f"[DEBUG] get_directory: app_id={app_id} → {path}")
     return path
 
@@ -17,9 +17,9 @@ def all_app_ids(dirs):
     return ids
 
 def get_dirs():
-    print("[DEBUG] Scanning '../App_Details' for subdirectories...")
-    for root, subdirs, files in os.walk('../App_Details', topdown=True):
-        if root == '../App_Details':  # Only collect immediate subdirs
+    print("[DEBUG] Scanning '../../app_details_json' for subdirectories...")
+    for root, subdirs, files in os.walk('../../app_details_json', topdown=True):
+        if root == '../../app_details_json':  # Only collect immediate subdirs
             subdirs.sort(key=lambda name: int(name.split('_')[0]))
             print(f"[DEBUG] Found subdirs: {subdirs[:5]}...")
             return subdirs
@@ -47,6 +47,7 @@ def convert_json_to_parquet(info, app_id, output_dir="parquet_output"):
     print(f"[DEBUG] convert_json_to_parquet: start for app_id={app_id}")
     data = info[app_id]['data']
     reviews = data.get('review_stats', {}).get('reviews', [])
+    author_data = review.get('author', {})
     print(f"[DEBUG] Number of reviews to process: {len(reviews)}")
     rows = []
 
@@ -70,6 +71,13 @@ def convert_json_to_parquet(info, app_id, output_dir="parquet_output"):
             'release_coming_soon':   data.get('release_date', {}).get('coming_soon'),
             'release_date':          data.get('release_date', {}).get('date'),
             'review_language':       review.get('language'),
+            'author_steamid':        author_data.get('steamid'),
+            'author_num_games_owned': author_data.get('num_games_owned'),
+            'author_num_reviews':   author_data.get('num_reviews'),
+            'author_playtime_forever': author_data.get('playtime_forever'),
+            'author_play_time_last_two_weeks': author_data.get('playtime_last_two_weeks'),
+            'author_playtime_at_review': author_data.get('playtime_at_review'),
+            'author_last_played':   author_data.get('last_played'),
             'review':                review.get('review'),
             'voted_up':              review.get('voted_up'),
             'votes_up':              review.get('votes_up'),
@@ -77,6 +85,7 @@ def convert_json_to_parquet(info, app_id, output_dir="parquet_output"):
             'weighted_vote_score':   float(review.get('weighted_vote_score')) 
                                       if review.get('weighted_vote_score') is not None 
                                       else None
+            
         }
         rows.append(entry)
 

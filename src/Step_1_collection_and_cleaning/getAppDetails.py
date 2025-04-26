@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("../App_Details/steam_app_scraper.log"),
+        logging.FileHandler("../app_details_json/steam_app_scraper.log"),
         logging.StreamHandler()
     ]
 )
@@ -19,7 +19,7 @@ logging.basicConfig(
 def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
     """Process a single Steam app to fetch its details and reviews."""
     # Set up app-specific variables
-    App_Details_url = f"https://store.steampowered.com/api/appdetails?appids={appID}"
+    app_details_json_url = f"https://store.steampowered.com/api/AppDetails?appids={appID}"
     
     app_review_url = (
         f"https://store.steampowered.com/appreviews/{appID}"
@@ -28,7 +28,7 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
     )
     
     # Create app-specific directory
-    app_dir = f"../App_Details/{appID}_data"
+    app_dir = f"../app_details_json/{appID}_data"
     Review_Detail_json = f"{app_dir}/Review_Details{appID}.json"
     rt_data_file = f"{app_dir}/rt_data"
     
@@ -104,7 +104,7 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
             logging.error(f"An error occurred for appID {appID}: {e}")
             return None
     
-    def get_reviews(review_data, app_details_data, start_cursor="", start_count=0):
+    def get_reviews(review_data, app_details_json_data, start_cursor="", start_count=0):
         """Iteratively fetches review pages and appends reviews to the app details."""
         current_cursor = ""
         # URL encode the cursor value if we're starting fresh
@@ -120,15 +120,15 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
         if start_cursor and os.path.exists(Review_Detail_json):
             try:
                 with open(Review_Detail_json, 'r') as file:
-                    app_details_data = json.load(file)
+                    app_details_json_data = json.load(file)
                 logging.info(f"Loaded existing review data for appID {appID} with {num_reviews_till_cursor} reviews")
             except Exception as e:
                 logging.error(f"Failed to load existing review data for appID {appID}: {e}")
                 # Create new data structure if loading failed
-                app_details_data.setdefault(str(appID), {}).setdefault("data", {}).setdefault("review_stats", {"reviews": []})
+                app_details_json_data.setdefault(str(appID), {}).setdefault("data", {}).setdefault("review_stats", {"reviews": []})
         else:
             # Ensure "review_stats" exists in the app details data for new collection
-            app_details_data.setdefault(str(appID), {}).setdefault("data", {}).setdefault("review_stats", {"reviews": []})
+            app_details_json_data.setdefault(str(appID), {}).setdefault("data", {}).setdefault("review_stats", {"reviews": []})
         
         # If resuming, we need to fetch the first page using the saved cursor
         if start_cursor:
@@ -136,12 +136,12 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
             review_data = get_data_json(first_page_url)
             if review_data is None:
                 logging.error(f"Failed to fetch reviews from saved cursor for appID {appID}")
-                return app_details_data
+                return app_details_json_data
         
         # Use 'and' to continue only if both conditions for a new page are met
         while (review_data["query_summary"]["num_reviews"] != 0) and (next_cursor != current_cursor):
             for item in review_data["reviews"]:
-                app_details_data[str(appID)]["data"]["review_stats"]["reviews"].append(item)
+                app_details_json_data[str(appID)]["data"]["review_stats"]["reviews"].append(item)
             
             logging.info(f"Going to next page for appID: {appID}")
             current_cursor = next_cursor
@@ -169,10 +169,10 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
             
             # Save progress to a JSON file after each page iteration
             with open(Review_Detail_json, 'w') as file:
-                json.dump(app_details_data, file, indent=1)
+                json.dump(app_details_json_data, file, indent=1)
         
         logging.info(f"Either JSON was empty or all reviews have been extracted for appID: {appID}.")
-        return app_details_data
+        return app_details_json_data
     
     # Main processing for this app
     try:
@@ -180,13 +180,13 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
         
         # Fetch app details only if we're not resuming or if we don't have them yet
         if not resume_review_collection or not os.path.exists(Review_Detail_json):
-            app_details = get_data_json(App_Details_url)
+            app_details_json = get_data_json(app_details_json_url)
             
-            if app_details is None:
+            if app_details_json is None:
                 logging.error(f"Failed to fetch app details for appID: {appID}")
                 return "failure"
             
-            if not app_details.get(str(appID), {}).get("success", False):
+            if not app_details_json.get(str(appID), {}).get("success", False):
                 logging.error(f"App details request was not successful for appID: {appID}")
                 return "failure"
                 
@@ -197,28 +197,28 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
                 return "failure"
                 
             # Process reviews (starting from beginning)
-            app_details_with_review = get_reviews(reviews, app_details)
+            app_details_json_with_review = get_reviews(reviews, app_details_json)
             
         else:
             # Resume from where we left off
             # Load existing app details data
             with open(Review_Detail_json, 'r') as file:
-                app_details = json.load(file)
+                app_details_json = json.load(file)
                 
             # Continue processing reviews from the saved cursor
-            app_details_with_review = get_reviews(
+            app_details_json_with_review = get_reviews(
                 {"query_summary": {"num_reviews": 1}},  # Dummy data, will be replaced in get_reviews
-                app_details,
+                app_details_json,
                 start_cursor=initial_cursor,
                 start_count=initial_reviews_count
             )
         
         # Calculate and add the total review count
-        app_details_final = get_total_num_reviews_int(app_details_with_review)
+        app_details_json_final = get_total_num_reviews_int(app_details_json_with_review)
         
         # Save the final data
         with open(Review_Detail_json, 'w') as file:
-            json.dump(app_details_final, file, indent=1)
+            json.dump(app_details_json_final, file, indent=1)
         
         # # Clean up the rt_data file since processing is complete
         # if os.path.exists(rt_data_file):
@@ -242,7 +242,7 @@ def load_app_ids(file_path):
 
 if __name__ == "__main__":
     # Load app IDs from the JSON file
-    app_ids_file = "../appIdData/sorted_steam_apps.json"
+    app_ids_file = "../appList/sorted_steam_apps.json"
     app_ids = load_app_ids(app_ids_file)
     
     if not app_ids:
@@ -251,12 +251,12 @@ if __name__ == "__main__":
     
     logging.info(f"Loaded {len(app_ids)} app IDs.")
     
-    # Create the main App_Details directory if it doesn't exist
-    os.makedirs("../App_Details", exist_ok=True)
+    # Create the main app_details_json directory if it doesn't exist
+    os.makedirs("../app_details_json", exist_ok=True)
     
     # Check if there's a resumption point
     resume_from = 0
-    resume_file = "../App_Details/resume_point.txt"
+    resume_file = "../app_details_json/resume_point.txt"
     if os.path.exists(resume_file):
         with open(resume_file, 'r') as file:
             try:

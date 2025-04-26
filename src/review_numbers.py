@@ -4,15 +4,15 @@ import time
 
 
 def get_directory(app_id):
-    return f'../App_Details/{app_id}_data/Review_Details{app_id}.json'
+    return f'../app_details_json/{app_id}_data/Review_Details{app_id}.json'
 
 def all_app_ids(dirs):
     return [str(d.split('_')[0]) for d in dirs]
 
 def get_dirs():
     dirs = []
-    for root, subdirs, files in os.walk('../App_Details', topdown=True):
-        if root == '../App_Details':  # Only collect immediate subdirs
+    for root, subdirs, files in os.walk('../app_details_json', topdown=True):
+        if root == '../app_details_json':  # Only collect immediate subdirs
             subdirs.sort(key=lambda name: int(name.split('_')[0]))
             dirs = subdirs
             break

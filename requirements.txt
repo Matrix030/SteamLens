@@ -4,4 +4,7 @@ numpy
 matplotlib
 seaborn
 pydantic
+uv
+json
+dask
 

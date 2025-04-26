@@ -1,3 +1,4 @@
-src/parquet_output
+parquet_output
 src/review_lengths.txt
-src/all_files.parquet
+all_files.parquet
+app_details_json

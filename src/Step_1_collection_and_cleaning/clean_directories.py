@@ -23,7 +23,7 @@ def clean_directories(base_path, log_file='non_empty_dirs.txt', action_log='log.
                     action_log_f.write(error_msg + '\n')
 
 # === SAFETY FIRST ===
-base_path = '../App_Details'
+base_path = '../app_details_json'
 print(f"You're about to scan and clean: {base_path}")
 proceed = input("Proceed? This may delete empty folders. Type 'YES' to continue: ")
 
