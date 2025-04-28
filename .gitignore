@@ -2,3 +2,5 @@ parquet_output_2_extras
 src/review_lengths.txt
 all_files.parquet
 app_details_json
+parquet_output_2_extras_with_names
+src/step_3_analysis/cleaned_data_polars

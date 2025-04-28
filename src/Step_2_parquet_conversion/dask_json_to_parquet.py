@@ -49,6 +49,7 @@ def process_app(app_id):
         for review in reviews:
             author_data = review.get('author', {})
             entry = {
+                'name': data.get('name'),
                 'steam_appid': data.get('steam_appid'),
                 'required_age': data.get('required_age'),
                 'is_free': data.get('is_free'),
@@ -89,7 +90,7 @@ def process_app(app_id):
             df = df.where(pd.notnull(df), None)  # Replace NaN with None
             
             # Save to parquet with metadata
-            output_dir = "../../parquet_output_2_extras"
+            output_dir = "../../parquet_output_2_extras_with_names"
             os.makedirs(output_dir, exist_ok=True)
             output_file = os.path.join(output_dir, f"{app_id}.parquet")
             
