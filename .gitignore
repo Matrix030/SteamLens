@@ -9,3 +9,7 @@ src/step_3_analysis/all_reviews_models_english
 src/step_3_analysis/all_reviews_outputs_english
 src/step_4_modeling/models
 src/step_4_modeling/outputs
+src/step_4_modeling/bertinsights_dislikes.json
+src/step_4_modeling/bertinsights_likes.json
+src/step_4_modeling/review_theme_summary.json
+
