@@ -1,3 +1,5 @@
+# SPARK (SLOW) -  This program converts all the json file into schema based parquet files.
+
 #!/usr/bin/env python3
 """
 Robust Memory-Efficient Parquet File Merger

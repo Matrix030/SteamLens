@@ -1,3 +1,5 @@
+#This program creates an ETL pipeline to get appDetails from the steamwebpage
+
 import requests
 import json
 import time

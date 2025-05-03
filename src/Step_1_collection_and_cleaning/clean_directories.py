@@ -1,3 +1,5 @@
+#this program removes the directory with no data.
+
 import os
 
 def clean_directories(base_path, log_file='non_empty_dirs.txt', action_log='log.txt', dry_run=True):

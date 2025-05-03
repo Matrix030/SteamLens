@@ -1,3 +1,4 @@
+# This programs reads the log details to kill a process when a certain string appears in the log file.
 import time
 import psutil
 import os

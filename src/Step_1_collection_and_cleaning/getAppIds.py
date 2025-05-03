@@ -1,3 +1,4 @@
+# This programs the the list of all the appids present on steam
 import requests
 import json
 
