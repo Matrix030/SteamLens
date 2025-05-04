@@ -8,12 +8,12 @@ import pyarrow.parquet as pq
 import dask
 
 def get_directory(app_id):
-    return f'../../app_details_json/{app_id}_data/Review_Details{app_id}.json'
+    return f'../app_details_json_2/{app_id}_data/Review_Details{app_id}.json'
 
 def get_dirs():
     """Find all subdirectories in app_details_json folder"""
-    for root, subdirs, files in os.walk('../../app_details_json', topdown=True):
-        if root == '../../app_details_json':
+    for root, subdirs, files in os.walk('../app_details_json_2', topdown=True):
+        if root == '../app_details_json_2':
             # Sort numerically by app ID
             subdirs.sort(key=lambda name: int(name.split('_')[0]))
             return subdirs
@@ -91,7 +91,7 @@ def process_app(app_id):
             df = df.where(pd.notnull(df), None)  # Replace NaN with None
             
             # Save to parquet with metadata
-            output_dir = "../../parquet_output_2_extras_with_names"
+            output_dir = "../../parquet_output_indie"
             os.makedirs(output_dir, exist_ok=True)
             output_file = os.path.join(output_dir, f"{app_id}.parquet")
             

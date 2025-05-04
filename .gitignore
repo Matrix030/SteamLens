@@ -14,3 +14,4 @@ src/Step_4_modeling/per_app_model/models
 src/Step_4_modeling/per_app_model/outputs
 src/app_details_json
 src/app_details_json_2
+parquet_output_indie

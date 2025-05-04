@@ -233,7 +233,7 @@ def process_app(appID, num_of_reviews_per_page=1, skip_if_exists=True):
 if __name__ == "__main__":
     # Define the specific app IDs to process
     app_ids = [
-        391540, 413150, 367520, 504230, 1145360, 1145350, 268910, 105600, 239030, 383870, 1868140, 2231450, 2379780, 2835570
+        1794680, 413150, 367520, 105600
     ]
     
     logging.info(f"Processing {len(app_ids)} specific app IDs.")
