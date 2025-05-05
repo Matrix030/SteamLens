@@ -19,6 +19,7 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
+
 # Reproducibility
 random.seed(42)
 np.random.seed(42)
@@ -62,6 +63,7 @@ def analyse_one_game(appid, themes):
 
     # 1) Find your parquet file
     CANDIDATE = [
+        'parquet_output_indie',
         'parquet_output_theme_combo'
     ]
     path = next((os.path.join(d, f"{appid}.parquet") for d in CANDIDATE 
@@ -149,7 +151,6 @@ def main():
     # Save results to CSV
     final_report.to_csv('steam_theme_reports.csv', index=False)
     print("Analysis complete. Results saved to 'steam_theme_reports.csv'")
-    print(final_report.head(20))
     
     # Clean up
     client.close()
