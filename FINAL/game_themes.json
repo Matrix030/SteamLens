@@ -1,0 +1,335 @@
+{
+"391540" :
+    {
+    "story": [
+        "story", "plot", "narrative", "pacifist", "genocide", "neutral",
+        "branching", "ending", "choice", "consequence", "moral",
+        "friendship", "redemption", "hope", "love", "loss", "memory",
+        "determination"
+    ],
+    "characters": [
+        "character", "frisk", "chara", "sans", "papyrus", "toriel",
+        "asgore", "alphys", "undyne", "mettaton", "flowey", "asriel",
+        "napstablook", "monster kid", "temmie", "burgerpants",
+        "npc", "relationship", "backstory"
+    ],
+
+    "gameplay": [
+        "gameplay", "rpg", "adventure", "exploration", "puzzle",
+        "bullet hell", "dodging", "timing", "menu", "save", "load",
+        "checkpoint", "inventory", "quest", "side quest", "boss fight"
+    ],
+
+    "combat": [
+        "combat", "battle", "fight", "act", "mercy", "spare", "talk",
+        "attack", "defense", "hp", "exp", "lv", "soul", "heart",
+        "pattern", "special attack", "blue soul", "green soul",
+        "orange soul", "purple soul", "yellow soul"
+    ],
+
+    "music": [
+        "music", "soundtrack", "ost", "song", "track", "theme", "melody",
+        "motif", "chiptune", "chip‑tune", "Megalovania", "Hopes and Dreams",
+        "His Theme", "Undertale OST", "piano", "8‑bit", "orchestral"
+    ],
+
+    "visuals": [
+        "visuals", "graphics", "sprite", "pixel art", "retro", "color",
+        "palette", "animation", "effect", "lighting", "ui", "hud",
+        "text box", "portrait", "scanline", "CRT"
+    ],
+
+    "humor_dialogue": [
+        "humor", "dialogue", "pun", "joke", "quirky", "whimsical",
+        "meta", "fourth wall", "narrator", "sarcasm", "flavor text",
+        "reference", "running gag", "comic timing"
+    ],
+
+    "morality": [
+        "morality", "ethics", "choice", "consequence", "violence",
+        "mercy", "guilt", "atonement", "judgment hall", "sins",
+        "player agency", "self‑reflection"
+    ],
+
+
+    "secrets_meta": [
+        "secret", "hidden", "easter egg", "gaster", "fun value",
+        "mystery door", "alternate route", "hard mode", "reset",
+        "true lab", "file delete", "save file", "corruption",
+        "exe", "meta narrative"
+    ],
+
+    "warp": [
+        "world", "setting", "underground", "ruins", "snowdin",
+        "waterfall", "hotland", "core", "new home", "castle",
+        "true lab", "temmie village", "river person", "map",
+        "environment", "atmosphere"
+    ]
+    },
+"10": {
+
+    "gameplay": [
+        "gameplay", "mechanics", "tactical shooter", "precision", "aim",
+        "headshot", "spray‑control", "burst‑fire", "recoil", "crosshair",
+        "peek", "counter‑strafe", "movement", "jump‑peek", "clutch",
+        "bomb plant", "defuse", "round", "eco‑round", "overtime"
+    ],
+
+
+    "weapons": [
+        "weapon", "gun", "rifle", "ak", "m4", "awp", "pistol", "deagle",
+        "smg", "shotgun", "sniper", "knife", "grenade", "flashbang",
+        "smoke", "molotov", "he‑nade", "incendiary", "zeus", "spray",
+        "pull‑out time", "reload"
+    ],
+
+
+    "maps": [
+        "map", "layout", "bombsite", "call‑out", "rotation", "angles",
+        "cover", "line‑up", "utility spot", "choke‑point", "dust2",
+        "mirage", "inferno", "nuke", "overpass", "ancient", "vertigo",
+        "office", "train", "cache"
+    ],
+
+
+    "competitive": [
+        "competitive", "matchmaking", "rank", "elo", "premier", "global elite",
+        "silver", "faceit", "esport", "tournament", "major", "league",
+        "teamplay", "strat", "timeout", "coach", "demo review", "practice"
+    ],
+
+
+    "economy & skins": [
+        "economy", "money", "buy", "force", "save", "full‑buy", "bonus‑loss",
+        "skin", "knife skin", "case", "capsule", "stattrak", "souvenir",
+        "sticker", "trade‑up", "market", "auction", "rarity", "float value",
+        "pattern", "lootbox"
+    ],
+
+
+    "anti_cheat": [
+        "cheater", "cheat", "hacker", "hack", "wallhack", "aimbot", "spinbot",
+        "vac", "vac ban", "prime", "overwatch", "smurf", "rage", "backtracking",
+        "triggerbot", "report", "banwave", "trust factor"
+    ],
+
+
+    "performance": [
+        "fps", "frame rate", "stutter", "lag", "ping", "tickrate", "sub‑tick",
+        "server", "hit‑reg", "netcode", "desync", "packet loss", "freeze",
+        "crash", "memory leak", "loading time", "update", "patch", "driver"
+    ],
+
+
+    "visuals": [
+        "visuals", "graphics", "shader", "lighting", "smoke effect",
+        "blood splatter", "particle", "texture", "model", "animation",
+        "ui", "hud", "crosshair style", "ray tracing", "color", "resolution",
+        "fov", "viewmodel"
+    ],
+
+
+    "audio": [
+        "audio", "sound", "footstep", "sound cue", "directional",
+        "occlusion", "gunshot", "reverb", "bomb beep", "defuse sound",
+        "voice chat", "callout", "microphone", "radio command", "volume",
+        "sound bug", "muffle", "mix"
+    ],
+
+
+    "community": [
+        "community", "friends", "lobby", "party", "team‑mate", "toxic",
+        "grief", "vote kick", "chat", "text chat", "mute", "spray logo",
+        "workshop", "community server", "surf", "bhop", "mods", "plugin",
+        "custom map", "training map"
+    ]
+},
+"1794680" :{
+
+    "gameplay": [
+        "gameplay", "rogue‑lite", "bullet heaven", "bullet hell",
+        "auto‑shooter", "idle shooter", "survival", "run", "session",
+        "wave", "horde", "timer", "30‑minute mark", "stage clear",
+        "pickup", "level‑up", "reroll", "skip", "banish", "gold rush"
+    ],
+
+
+    "weapons": [
+
+        "whip", "magic wand", "knife", "axe", "cross", "king bible",
+        "fire wand", "garlic", "lightning ring", "rune tracer",
+        "pentagram", "song of mana", "shadow pinion", "laurel",
+        "clock lancet", "flames of misspell", "jettonion", "bracelets",
+
+        "bloody tear", "holy wand", "infinite corridor", "crimson shroud",
+        "heaven sword", "hellfire", "thunder loop", "labora",
+        "gorgeous moon", "mannajja", "vicious hunger", "no future",
+        "fuwalafuwaloo", "phieraggi", "ashes of muspell", "legionnaire",
+        "spellstrom", "night sword", "muramasa"
+    ],
+
+
+    "passive_items": [
+        "spinach", "candelabrador", "bracer", "clover", "duplicator",
+        "tiragisú", "wings", "empty tome", "armor", "pummarola",
+        "heart", "stone mask", "skull o’maniac", "crown", "curse",
+        "torrona’s box", "golden egg", "super candybox II turbo"
+    ],
+
+
+    "characters": [
+        "antonio", "impi", "pascallina", "gennaro", "arcanist",
+        "clerici", "mortaccio", "porta", "llama", "christine", "pugnala",
+        "giovanna", "poppea", "concetta", "bianca", "oskari",
+        "queen sigma", "big trouser", "red death", "missingno",
+        "secret", "coffin", "unlock", "starting weapon", "growth"
+    ],
+
+
+    "arcana": [
+        "arcana", "card", "VIII – Mad Groove", "VI – Sarabande of Healing",
+        "XX – Silent Old Sanctuary", "XVI – Slash", "XI – Waltz of Pearls",
+        "XXI – Blood Astronomia", "XVII – Lost & Found Painting",
+        "banish card", "draw", "deck", "reroll", "curse arcana"
+    ],
+
+    "stages": [
+        "stage", "mad forest", "inlaid library", "dairy plant",
+        "gallo tower", "cappella magna", "bone zone", "moongolow",
+        "boss rash", "il molise", "green acres", "endless mode",
+        "inverse mode", "hyper mode", "limit break", "tides of the foscari",
+        "legacy of the moonspell", "operation guns", "astral stair",
+        "lake fuma", "space 54"
+    ],
+
+    "meta_progression": [
+        "power up", "power‑ups menu", "gold", "merchant",
+        "eggs", "golden egg", "limit break", "relic", "milky way map",
+        "grim grimoire", "arcana unlock", "jelii crystal",
+        "randomazzo", "collection", "achievement", "unlock condition"
+    ],
+
+    "difficulty_modes": [
+        "difficulty", "hyper", "inverse", "endless", "hurry", "boss rush",
+        "curse", "skull", "minute 20 boss", "death", "red death",
+        "white death", "green death", "stalker", "drowner"
+    ],
+
+    "enemies": [
+        "enemy", "bat", "giant bat", "skeleton", "ghost", "werewolf",
+        "witch", "mummy", "reaper", "plant ring", "golem",
+        "lion head", "bone dragon", "valkyrie", "guardian", "boss",
+        "mob density", "spawning", "hp scaling"
+    ],
+
+    "visuals": [
+        "visuals", "pixel art", "retro", "sprite", "color burst",
+        "particle", "flash", "damage numbers", "outline", "shader",
+        "vfx", "screen shake", "hud", "ui", "stage lighting", "night cycle"
+    ],
+
+    "audio": [
+        "audio", "music", "soundtrack", "ost", "track", "loop",
+        "banger", "chiptune", "sfx", "pickup sound", "level‑up jingle",
+        "healing ping", "coin chime", "death roar", "mute", "volume"
+    ],
+
+    "performance": [
+        "fps", "frame rate", "lag", "stutter", "slowdown", "optimization",
+        "mobile port", "steam deck", "controller support", "rumble",
+        "graphics setting", "update patch", "save file", "cloud save"
+    ],
+
+    "community": [
+        "community", "patch", "update", "dlc", "mod", "workshop",
+        "guide", "wiki", "speedrun", "challenge", "leaderboard",
+        "theorycraft", "build", "tier list", "crossover", "among us",
+        "collab", "feedback", "balancing"
+    ]
+},
+"1966720": {
+    "gameplay": [
+        "gameplay", "co‑op", "multiplayer", "first‑person", "salvage",
+        "scrap collecting", "quota", "profit quota", "deadline", "shift",
+        "timer", "hazard level", "weather", "eclipse", "fog", "storm",
+        "launch", "land", "extraction", "escape", "weight limit",
+        "door codes", "lever", "ship recall"
+    ],
+
+    "equipment": [
+        "equipment", "flashlight", "pro flashlight", "lantern", "boombox",
+        "walkie‑talkie", "radar‑booster", "lockpicker", "stun grenade",
+        "flashbang", "zap gun", "shovel", "yield sign", "stop sign",
+        "shotgun", "shell", "jetpack", "inverse teleporter", "extendo grip",
+        "clown horn", "signal translator", "spray paint", "bunk beds",
+        "terminal decoration"
+    ],
+
+    "enemies": [
+        "enemy", "entity", "Bracken", "Coil‑Head", "Masked", "Jester",
+        "Thumper", "Circuit Bee", "Eyeless Dog", "Forest Keeper",
+        "Maneater", "Barber", "Butler", "Old Bird", "Tulip Snake",
+        "Ghost Girl", "Baboon Hawk", "Earth Leviathan", "Manticoil",
+        "Snare Flea", "Bunker Spider"
+    ],
+
+    "hazards": [
+        "hazard", "turret", "landmine", "spike trap", "sentry drone",
+        "electrical trap", "pitfall", "fire exit alarm", "toxic gas",
+        "sandstorm", "flash storm", "flood rain", "heat wave",
+        "eclipse darkness"
+    ],
+
+    "moons": [
+        "Gordion", "Experimentation", "Assurance", "Vow", "Offense",
+        "March", "Adamance", "Rend", "Dine", "Titan",
+        "Embrion", "Artifice", "Liquidation", "Challenge Moon",
+        "Weekly Challenge", "The Company"
+    ],
+
+    "scrap": [
+        "scrap", "large axle", "gold bar", "v‑type engine", "cash register",
+        "rainbow fish", "teeth", "brass bell", "antique vase",
+        "air horn", "ancient coin", "music box", "toy robot",
+        "applicator", "apparatus", "gift", "painting", "ring", "mask"
+    ],
+
+    "terminal_ops": [
+        "terminal", "scan", "ping", "view monitor", "door", "unlock",
+        "open", "close", "overload", "disable turret", "disable mine",
+        "store", "confirm", "cancel", "ship status", "credits balance"
+    ],
+
+    "economy": [
+        "company credits", "store", "buy", "sell", "price", "discount",
+        "tax", "profit quota", "deadline day", "quota meter",
+        "power‑cell upgrade", "engine upgrade", "radar", "decor rotation"
+    ],
+
+    "communication": [
+        "proximity voice", "radio", "walkie", "callout", "code word",
+        "map call‑outs", "lobby chat", "text chat", "signal sound",
+        "horn", "boombox beat", "mission planning"
+    ],
+
+    "audio_visuals": [
+        "audio", "footstep", "monster cue", "music stinger",
+        "heartbeat", "proximity static", "flashlight beam", "CRT UI",
+        "pixel‑low‑poly", "shader", "shadow", "rain effect",
+        "screen shake", "vfx clutter"
+    ],
+
+    "performance": [
+        "fps", "optimization", "lag spike", "desync", "netcode",
+        "rubber‑band", "save bug", "crash", "hotfix", "patch",
+        "steam deck", "ultrawide", "controller"
+    ],
+
+    "community": [
+        "community", "update", "patch notes", "version 55",
+        "mod", "workshop", "steam guide", "tier list",
+        "challenge seed", "speedrun", "clip", "meme",
+        "feedback", "balancing", "roadmap"
+    ]
+}
+}
