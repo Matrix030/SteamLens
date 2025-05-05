@@ -151,6 +151,7 @@ def main():
     # Save results to CSV
     final_report.to_csv('steam_theme_reports.csv', index=False)
     print("Analysis complete. Results saved to 'steam_theme_reports.csv'")
+
     
     # Clean up
     client.close()
