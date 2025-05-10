@@ -1,0 +1,3 @@
+[console_scripts]
+stemlens = stemlens.app:main
+

@@ -21,6 +21,7 @@ import datetime
 import streamlit as st
 from tqdm.auto import tqdm
 from dask.distributed import Client, LocalCluster
+from dask.distributed import get_worker
 import dask.dataframe as dd
 import dask.bag as db
 from sentence_transformers import SentenceTransformer

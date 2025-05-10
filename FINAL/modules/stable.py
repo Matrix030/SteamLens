@@ -611,7 +611,7 @@ def process_uploaded_files(uploaded_files, themes_file="game_themes.json"):
             report_df['#Reviews'] = report_df['review_count'].astype(int)
             report_df['Positive'] = report_df['likes_sum'].astype(int)
             report_df['Negative'] = report_df['dislikes_sum'].astype(int)
-            
+
             # Ensure '#Reviews' is not zero to avoid division by zero errors
             report_df['LikeRatio'] = '0.0%'
             report_df.loc[report_df['#Reviews'] > 0, 'LikeRatio'] = \
@@ -620,7 +620,7 @@ def process_uploaded_files(uploaded_files, themes_file="game_themes.json"):
             report_df['DislikeRatio'] = '0.0%'
             report_df.loc[report_df['#Reviews'] > 0, 'DislikeRatio'] = \
                 (report_df['Negative'] / report_df['#Reviews'] * 100).round(1).astype(str) + '%'
-            
+
             # Select and rename columns for the final report
             final_report = report_df[[
                 'steam_appid',
@@ -652,7 +652,7 @@ def process_uploaded_files(uploaded_files, themes_file="game_themes.json"):
             final_report['Negative_Reviews'] = final_report['Negative_Reviews'].apply(lambda x: x if isinstance(x, list) else [])
         else:
             final_report['Negative_Reviews'] = pd.Series([[] for _ in range(len(final_report))], index=final_report.index)
-        
+
         # Save intermediate results to avoid recomputation if summarization fails
         csv_path = 'output_csvs/sentiment_report.csv'
         final_report.to_csv(csv_path, index=False)
