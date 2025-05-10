@@ -24,6 +24,11 @@ def get_theme_embeddings(app_ids: List[int], game_themes: Dict[int, Dict[str, Li
     Returns:
         dict: Dictionary mapping app IDs to arrays of theme embeddings
     """
+    # Move the model to the appropriate device
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    embedder.to(device)
+        
     embeddings = {}
     for appid in app_ids:
         if appid not in embeddings and appid in game_themes:
@@ -58,6 +63,11 @@ def assign_topic(df_partition: pd.DataFrame, game_themes: Dict[int, Dict[str, Li
     
     # Get embeddings only for app IDs in this partition
     local_theme_embeddings = get_theme_embeddings(app_ids, game_themes, embedder)
+    
+    # Move the model to the appropriate device
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    embedder.to(device)
     
     reviews = df_partition['review'].tolist()
     # Compute embeddings in one go with batching

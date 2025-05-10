@@ -123,9 +123,22 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             if 'process_dashboard_link' not in st.session_state:
                 st.session_state.process_dashboard_link = dashboard_link
             
-            # Initialize SBERT embedder
-            embedder = SentenceTransformer(SENTENCE_TRANSFORMER_MODEL)
-            status_text.write(f"Initialized sentence embedder: {SENTENCE_TRANSFORMER_MODEL}")
+            # Initialize SBERT embedder once and share with all workers
+            status_text.write(f"Initializing sentence embedder: {SENTENCE_TRANSFORMER_MODEL}")
+            # Set device to CPU explicitly to avoid CUDA tensor serialization issues
+            embedder = SentenceTransformer(SENTENCE_TRANSFORMER_MODEL, device='cpu')
+            
+            # Ensure all model parameters are on CPU before sharing
+            for param in embedder.parameters():
+                if hasattr(param, 'data') and hasattr(param.data, 'cpu'):
+                    param.data = param.data.cpu()
+                    
+            # Create a unique name for the model dataset
+            model_dataset_name = f"embedder_dataset_{int(time.time())}"
+            
+            # Publish the embedder to all workers
+            client.publish_dataset(embedder, name=model_dataset_name)
+            status_text.write(f"✅ Sentence embedder published to all workers with dataset name: {model_dataset_name}")
             
             # Process each valid file
             all_ddfs = []
@@ -173,8 +186,14 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             status_text.write("Assigning topics to reviews...")
             meta = combined_ddf._meta.assign(topic_id=np.int64())
             
-            # Create a partial function that includes GAME_THEMES and embedder
+            # Create a function that includes GAME_THEMES and the model_dataset_name
             def assign_topic_with_context(df_partition):
+                from dask.distributed import get_worker
+                # Get the worker's client to access the dataset
+                worker = get_worker()
+                # Get the model from the published dataset
+                embedder = worker.client.get_dataset(model_dataset_name)
+                # Now process with the actual model instance
                 return assign_topic(df_partition, GAME_THEMES, embedder)
             
             ddf_with_topic = combined_ddf.map_partitions(assign_topic_with_context, meta=meta)

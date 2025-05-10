@@ -1,7 +1,7 @@
-accelerate
-dask[distributed]
-numpy
+streamlit
 pandas
+numpy
+dask[distributed]
 pyarrow
 sentence-transformers
-streamlit
+accelerate

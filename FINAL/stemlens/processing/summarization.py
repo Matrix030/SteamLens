@@ -9,8 +9,9 @@ Uses transformers to generate summaries of positive and negative reviews
 import torch
 import pandas as pd
 from tqdm.auto import tqdm
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Union, Optional
 from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
+from dask.distributed import Future
 
 def prepare_partition(start_idx: int, end_idx: int, final_report: pd.DataFrame) -> pd.DataFrame:
     """Prepare a partition of the final report for processing
@@ -25,13 +26,17 @@ def prepare_partition(start_idx: int, end_idx: int, final_report: pd.DataFrame) 
     """
     return final_report.iloc[start_idx:end_idx].copy()
 
-def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_config: Dict[str, Any]) -> List[Tuple[int, str, str]]:
+def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_config: Dict[str, Any], 
+                     model_dataset_name: Optional[str] = None, 
+                     tokenizer_dataset_name: Optional[str] = None) -> List[Tuple[int, str, str]]:
     """Optimized worker for GPU processing with sentiment separation
     
     Args:
         partition_df (DataFrame): Partition of the final report to process
         worker_id (int): ID of the worker processing this partition
         hardware_config (dict): Configuration for hardware optimization
+        model_dataset_name (str, optional): Name of the dataset containing the model
+        tokenizer_dataset_name (str, optional): Name of the dataset containing the tokenizer
         
     Returns:
         list: List of tuples (index, positive_summary, negative_summary)
@@ -39,20 +44,40 @@ def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_confi
     # Import needed packages
     from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
     import torch
+    from dask.distributed import get_worker
     
     # Load model components with optimal settings
     print(f"Worker {worker_id} initializing with optimized settings")
     
-    # Load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(hardware_config['model_name'])
-    
-    # Load model with optimized settings
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        hardware_config['model_name'],
-        torch_dtype=torch.float16,        # Half precision for speed
-        device_map="auto",                # Automatic device placement
-        low_cpu_mem_usage=True            # Optimized memory usage
-    )
+    # Use published model and tokenizer if dataset names are provided, otherwise load them
+    if model_dataset_name is not None and tokenizer_dataset_name is not None:
+        # Get the worker and access the datasets
+        worker = get_worker()
+        model = worker.client.get_dataset(model_dataset_name)
+        tokenizer = worker.client.get_dataset(tokenizer_dataset_name)
+        print(f"Worker {worker_id} using model and tokenizer from published datasets")
+        
+        # After receiving the model, move it to the appropriate device
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if device == "cuda":
+            # Move to GPU with half precision for speed if GPU is available
+            model = model.to(device).half()
+            print(f"Worker {worker_id} moved model to {device} with half precision")
+        else:
+            model = model.to(device)
+            print(f"Worker {worker_id} moved model to {device}")
+    else:
+        # Load tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(hardware_config['model_name'])
+        
+        # Load model with optimized settings
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = AutoModelForSeq2SeqLM.from_pretrained(
+            hardware_config['model_name'],
+            torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+            device_map="auto",
+            low_cpu_mem_usage=True
+        )
     
     # Create optimized pipeline
     summarizer = pipeline(
