@@ -1,6 +1,0 @@
-dask[distributed]
-numpy
-pandas
-pyarrow
-sentence-transformers
-streamlit

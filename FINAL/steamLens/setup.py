@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="stemlens",
+    name="steamLens",
     version="1.0.0",
     packages=find_packages(),
     include_package_data=True,
@@ -17,7 +17,7 @@ setup(
     python_requires=">=3.6",
     entry_points={
         'console_scripts': [
-            'stemlens=stemlens.app:main',
+            'steamLens=steamLens.app:main',
         ],
     },
 ) 

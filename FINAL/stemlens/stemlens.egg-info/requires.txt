@@ -1,7 +1,0 @@
-streamlit
-pandas
-numpy
-dask[distributed]
-pyarrow
-sentence-transformers
-accelerate

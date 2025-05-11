@@ -17,11 +17,11 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 # Now use absolute imports
-from stemlens.config.app_config import STREAMLIT_PAGE_CONFIG
-from stemlens.ui.upload_tab import render_upload_tab
-from stemlens.ui.summarize_tab import render_summarize_tab
-from stemlens.ui.results_tab import render_results_tab
-from stemlens.ui.sidebar import render_sidebar
+from steamLens.config.app_config import STREAMLIT_PAGE_CONFIG
+from steamLens.ui.upload_tab import render_upload_tab
+from steamLens.ui.summarize_tab import render_summarize_tab
+from steamLens.ui.results_tab import render_results_tab
+from steamLens.ui.sidebar import render_sidebar
 
 def main():
     """Main Streamlit UI with comprehensive timing and sentiment analysis"""

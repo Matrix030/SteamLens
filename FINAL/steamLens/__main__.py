@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-__main__.py - Entry point for stemlens when run as a module
+__main__.py - Entry point for steamLens when run as a module
 """
 
 import os
