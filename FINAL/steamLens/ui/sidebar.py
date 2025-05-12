@@ -89,7 +89,23 @@ def render_timing_metrics(timing_data: Dict[str, Any]) -> None:
     # Display the timing metrics
     st.sidebar.markdown(f"**Total Session Time:** {format_time(global_elapsed_time)}")
     st.sidebar.markdown(f"**Processing Time:** {format_time(process_time)}")
-    st.sidebar.markdown(f"**Summarization Time:** {format_time(summarize_time)}")
+    
+    # Make summarization time display more prominent
+    if summarize_time:
+        st.sidebar.markdown(f"""
+        **Summarization Time:** 
+        <span style='background-color: #b2f2bb; padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-weight: bold;'>
+        {format_time(summarize_time)}
+        </span>
+        """, unsafe_allow_html=True)
+        
+        # Add timestamps for summarization if available
+        if timing_data['summarize_start_time'] and timing_data['summarize_end_time']:
+            start_formatted = datetime.datetime.fromtimestamp(timing_data['summarize_start_time']).strftime('%H:%M:%S')
+            end_formatted = datetime.datetime.fromtimestamp(timing_data['summarize_end_time']).strftime('%H:%M:%S')
+            st.sidebar.caption(f"Started: {start_formatted} | Completed: {end_formatted}")
+    else:
+        st.sidebar.markdown(f"**Summarization Time:** {format_time(summarize_time)}")
     
     # If both processing and summarization were completed, show total analytical time
     if process_time and summarize_time:

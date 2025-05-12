@@ -40,12 +40,24 @@ def render_summarize_tab() -> None:
             summarized_report = summarize_report(st.session_state.result['final_report'])
             
             # Calculate elapsed time
-            elapsed_time = time.time() - start_time
-            st.session_state.timing_data['summarize_end_time'] = time.time()
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            st.session_state.timing_data['summarize_end_time'] = end_time
             
             if summarized_report is not None:
                 st.session_state.summarized_report = summarized_report
+                
+                # Display execution time in a prominent way
                 st.success(f"✅ Sentiment summarization completed in {elapsed_time:.2f} seconds!")
+                
+                # Create a dedicated section for timing metrics
+                st.subheader("Execution Time Metrics")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Total Time", f"{elapsed_time:.2f} seconds")
+                with col2:
+                    per_item = elapsed_time/len(summarized_report) if len(summarized_report) > 0 else 0
+                    st.metric("Average Per Item", f"{per_item:.4f} seconds")
                 
                 # Show sample of summarized data
                 with st.expander("Show sample of sentiment summaries"):

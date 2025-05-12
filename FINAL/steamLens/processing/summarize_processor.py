@@ -185,8 +185,8 @@ def summarize_report(final_report: pd.DataFrame) -> Optional[pd.DataFrame]:
         
         # Report timing
         elapsed_time = time.time() - start_time
-        status_text.write(f"✅ Optimized sentiment analysis completed in {elapsed_time:.2f} seconds")
-        status_text.write(f"Average time per item: {elapsed_time/len(final_report):.2f} seconds")
+        status_text.write(f"✅ **EXECUTION TIME:** {elapsed_time:.2f} seconds")
+        status_text.write(f"✅ Average time per item: {elapsed_time/len(final_report):.4f} seconds")
         
         # Save results
         try:
@@ -198,7 +198,7 @@ def summarize_report(final_report: pd.DataFrame) -> Optional[pd.DataFrame]:
         # Calculate elapsed time for this phase
         phase_elapsed_time = time.time() - phase_start_time
         formatted_time = str(datetime.timedelta(seconds=int(phase_elapsed_time)))
-        status_text.write(f"✅ Total summarization time: {formatted_time}")
+        status_text.write(f"✅ **TOTAL SUMMARIZATION TIME:** {formatted_time}")
         
         return final_report
         

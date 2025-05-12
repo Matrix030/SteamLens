@@ -198,13 +198,18 @@ def update_main_progress(futures: List[Any], progress_bar: Any, stop_flag: List[
         final_report_length (int): Length of the final report (for progress calculation)
     """
     import time
+    start_time = time.time()
+    
     while not stop_flag[0]:
         # Count completed futures
         completed_count = sum(f.status == 'finished' for f in futures)
-        completed_percentage = completed_count / len(futures)
+        completed_percentage = completed_count / len(futures) if len(futures) > 0 else 0
         
         # Update progress bar
         progress_bar.progress(completed_percentage)
+        
+        # Calculate elapsed time
+        elapsed_time = time.time() - start_time
         
         # Only check every 2 seconds to reduce overhead
         time.sleep(2) 
