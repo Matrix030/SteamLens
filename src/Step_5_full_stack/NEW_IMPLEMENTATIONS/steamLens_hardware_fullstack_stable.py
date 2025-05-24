@@ -1256,6 +1256,6 @@ if __name__ == "__main__":
     except Exception as e:
         # If there's an unhandled exception, record the end time to still get timing data
         if 'timing_data' in st.session_state:
-            st.session_state.timing_data['global_end_time'] = time.time()
+            st.session_state.timing_data['global_end_time'] = time.time() 
         st.error(f"An error occurred: {str(e)}")
         raise e
