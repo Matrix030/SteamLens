@@ -80,6 +80,9 @@ def summarize_report(final_report: pd.DataFrame) -> Optional[pd.DataFrame]:
         client = Client(cluster)
         status_text.write(f"Dask cluster initialized with {worker_count} workers")
         
+        # Store client in session state for potential reset
+        st.session_state.summarize_client = client
+        
         # Immediately display dashboard link for monitoring
         with dashboard_placeholder.container():
             st.success("✅ Dask Summarization Cluster Ready")

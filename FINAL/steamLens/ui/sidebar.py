@@ -10,9 +10,35 @@ import os
 import datetime
 import streamlit as st
 from typing import Dict, Any
+from dask.distributed import Client
 
 from ..config.app_config import DEFAULT_THEME_FILE
 from ..utils.system_utils import format_time
+
+def reset_dask_workers():
+    """Reset all Dask workers by closing all clients and clusters"""
+    # Get all clients from session state
+    clients = []
+    if 'process_client' in st.session_state:
+        clients.append(st.session_state.process_client)
+    if 'summarize_client' in st.session_state:
+        clients.append(st.session_state.summarize_client)
+    
+    # Close all clients
+    for client in clients:
+        try:
+            if client and not client.status == 'closed':
+                client.close()
+        except Exception as e:
+            st.sidebar.error(f"Error closing client: {str(e)}")
+    
+    # Clear dashboard links from session state
+    if 'process_dashboard_link' in st.session_state:
+        del st.session_state.process_dashboard_link
+    if 'summarize_dashboard_link' in st.session_state:
+        del st.session_state.summarize_dashboard_link
+    
+    st.sidebar.success("✅ All Dask workers have been reset!")
 
 def render_sidebar() -> None:
     """Render the sidebar UI
@@ -42,6 +68,11 @@ def render_sidebar() -> None:
     # Display dashboard links if available
     st.sidebar.markdown("---")
     st.sidebar.header("🔗 Dask Dashboards")
+    
+    # Add reset button if any dashboard is active
+    if 'process_dashboard_link' in st.session_state or 'summarize_dashboard_link' in st.session_state:
+        if st.sidebar.button("🔄 Reset Dask Workers", help="Kill all Dask workers and close connections"):
+            reset_dask_workers()
     
     if 'process_dashboard_link' in st.session_state:
         st.sidebar.markdown(f"**[Processing Dashboard]({st.session_state.process_dashboard_link})** ✨")

@@ -113,6 +113,9 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             dashboard_link = client.dashboard_link
             status_text.write(f"Dask dashboard initialized")
             
+            # Store client in session state for potential reset
+            st.session_state.process_client = client
+            
             # Immediately display dashboard link for monitoring
             with dashboard_placeholder.container():
                 st.success("✅ Dask Processing Cluster Ready")
