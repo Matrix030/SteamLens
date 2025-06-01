@@ -64,21 +64,16 @@ git clone https://github.com/yourusername/steamLens.git
 cd steamLens
 ```
 
-2. Install the package:
+2. Install dependencies:
 ```bash
-pip install -e .
+pip install -r requirements.txt
 ```
 
 ## 💻 Usage
 
 Run the application using:
 ```bash
-steamLens
-```
-
-Or directly with Python:
-```bash
-python -m steamLens
+streamlit run app.py
 ```
 
 ## 🔧 Processing Configuration
@@ -108,14 +103,18 @@ python -m steamLens
 
 ```
 steamLens/
+├── app.py                   # Main Streamlit application
 ├── processing/
 │   ├── process_files.py     # Main file processing logic
 │   ├── topic_assignment.py  # Theme assignment logic
 │   ├── summarization.py     # Review summarization logic
 │   └── summarize_processor.py # Summarization orchestration
-├── app.py                   # Main application entry point
-├── __main__.py             # Package entry point
-└── setup.py                # Package configuration
+├── config/                  # Configuration files
+├── data/                    # Data storage
+├── ui/                      # UI components
+├── utils/                   # Utility functions
+├── game_themes.json         # Game theme definitions
+└── requirements.txt         # Project dependencies
 ```
 
 ## 🤝 Contributing
