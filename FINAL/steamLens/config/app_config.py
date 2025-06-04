@@ -4,6 +4,7 @@
 """
 app_config.py - Configuration parameters for SteamLens
 Contains constants, defaults, and configuration settings
+can change summarization limit here
 """
 
 import os
@@ -22,13 +23,17 @@ STREAMLIT_PAGE_CONFIG = {
 
 # Default hardware configuration for summarization
 HARDWARE_CONFIG = {
-    'worker_count': 6,                # Default for high-end CPU
-    'memory_per_worker': '3GB',       # Adjust based on available RAM
-    'gpu_batch_size': 96,             # Adjust based on GPU VRAM
-    'model_name': 'sshleifer/distilbart-cnn-12-6',  # Efficient summarization model
-    'chunk_size': 400,                # Chunk size for processing reviews
-    'checkpoint_frequency': 25,       # Frequency of checkpoints
-    'cleanup_frequency': 10,          # Frequency of memory cleanup
+    'worker_count': 6,
+    'memory_per_worker': '3GB',
+    'gpu_batch_size': 96,
+    'model_name': 'sshleifer/distilbart-cnn-12-6',
+    'chunk_size': 400,
+    'checkpoint_frequency': 25,
+    'cleanup_frequency': 10,
+    # Add these new parameters for longer summaries:
+    'max_summary_length': 300,  # Increase from default 60
+    'min_summary_length': 80,   # Increase from default 20
+    'num_beams': 4,            # Increase from 2 for better quality
 }
 
 # Default file and path settings

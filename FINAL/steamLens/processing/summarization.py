@@ -29,48 +29,39 @@ def prepare_partition(start_idx: int, end_idx: int, final_report: pd.DataFrame) 
 def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_config: Dict[str, Any], 
                      model_dataset_name: Optional[str] = None, 
                      tokenizer_dataset_name: Optional[str] = None) -> List[Tuple[int, str, str]]:
-    """Optimized worker for GPU processing with sentiment separation
+    """Optimized worker for GPU processing with sentiment separation and configurable summary length"""
     
-    Args:
-        partition_df (DataFrame): Partition of the final report to process
-        worker_id (int): ID of the worker processing this partition
-        hardware_config (dict): Configuration for hardware optimization
-        model_dataset_name (str, optional): Name of the dataset containing the model
-        tokenizer_dataset_name (str, optional): Name of the dataset containing the tokenizer
-        
-    Returns:
-        list: List of tuples (index, positive_summary, negative_summary)
-    """
     # Import needed packages
     from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
     import torch
     from dask.distributed import get_worker
     
+    # Get summary length parameters from config (with fallback defaults)
+    max_length = hardware_config.get('max_summary_length', 150)  # Increased default
+    min_length = hardware_config.get('min_summary_length', 40)   # Increased default
+    num_beams = hardware_config.get('num_beams', 4)              # Better quality
+    
+    print(f"Worker {worker_id} using summary lengths: min={min_length}, max={max_length}, beams={num_beams}")
+    
     # Load model components with optimal settings
     print(f"Worker {worker_id} initializing with optimized settings")
     
-    # Use published model and tokenizer if dataset names are provided, otherwise load them
+    # [Previous model loading code remains the same...]
     if model_dataset_name is not None and tokenizer_dataset_name is not None:
-        # Get the worker and access the datasets
         worker = get_worker()
         model = worker.client.get_dataset(model_dataset_name)
         tokenizer = worker.client.get_dataset(tokenizer_dataset_name)
         print(f"Worker {worker_id} using model and tokenizer from published datasets")
         
-        # After receiving the model, move it to the appropriate device
         device = "cuda" if torch.cuda.is_available() else "cpu"
         if device == "cuda":
-            # Move to GPU with half precision for speed if GPU is available
             model = model.to(device).half()
             print(f"Worker {worker_id} moved model to {device} with half precision")
         else:
             model = model.to(device)
             print(f"Worker {worker_id} moved model to {device}")
     else:
-        # Load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(hardware_config['model_name'])
-        
-        # Load model with optimized settings
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model = AutoModelForSeq2SeqLM.from_pretrained(
             hardware_config['model_name'],
@@ -86,8 +77,8 @@ def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_confi
         tokenizer=tokenizer,
         framework='pt',
         model_kwargs={
-            "use_cache": True,            # Enable caching for speed
-            "return_dict_in_generate": True  # More efficient generation
+            "use_cache": True,
+            "return_dict_in_generate": True
         }
     )
     
@@ -96,34 +87,31 @@ def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_confi
         gpu_mem = torch.cuda.memory_allocated(0) / (1024**3)
         print(f"Worker {worker_id}: GPU Memory: {gpu_mem:.2f}GB allocated")
     
-    # Highly optimized batch processing function
+    # Updated batch processing function with configurable parameters
     def process_chunks_batched(chunks: List[str]) -> List[str]:
-        """Process chunks in large batches for GPU"""
+        """Process chunks in large batches for GPU with configurable summary length"""
         all_summaries = []
         
-        # Use large batches for the GPU
         for i in range(0, len(chunks), hardware_config['gpu_batch_size']):
             batch = chunks[i:i+hardware_config['gpu_batch_size']]
             batch_summaries = summarizer(
                 batch,
-                max_length=60,
-                min_length=20,
+                max_length=max_length,      # Use configurable max length
+                min_length=min_length,      # Use configurable min length
                 truncation=True,
                 do_sample=False,
-                num_beams=2  # Use beam search for better quality with minimal speed impact
+                num_beams=num_beams         # Use configurable beam search
             )
             all_summaries.extend([s["summary_text"] for s in batch_summaries])
             
-            # Minimal cleanup - only when really needed
             if i % (hardware_config['gpu_batch_size'] * 3) == 0 and torch.cuda.is_available():
                 torch.cuda.empty_cache()
                     
         return all_summaries
     
-    # Optimized hierarchical summary function
+    # Updated hierarchical summary function with configurable length
     def hierarchical_summary(reviews: List[str]) -> str:
-        """Create hierarchical summary with optimized chunk sizes"""
-        # Handle edge cases efficiently
+        """Create hierarchical summary with configurable length"""
         if not reviews or not isinstance(reviews, list) or len(reviews) == 0:
             return "No reviews available for summarization."
         
@@ -132,10 +120,11 @@ def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_confi
             doc = "\n\n".join(reviews)
             return summarizer(
                 doc,
-                max_length=60,
-                min_length=20,
+                max_length=max_length,      # Use configurable max length
+                min_length=min_length,      # Use configurable min length
                 truncation=True,
-                do_sample=False
+                do_sample=False,
+                num_beams=num_beams         # Use configurable beam search
             )[0]['summary_text']
         
         # Process larger review sets with optimized chunking
@@ -148,40 +137,35 @@ def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_confi
         # Process chunks with optimized batching
         intermediate_summaries = process_chunks_batched(all_chunks)
         
-        # Create final summary
+        # Create final summary with longer length
         joined = " ".join(intermediate_summaries)
         return summarizer(
             joined,
-            max_length=60,
-            min_length=20,
+            max_length=max_length,      # Use configurable max length
+            min_length=min_length,      # Use configurable min length
             truncation=True,
-            do_sample=False
+            do_sample=False,
+            num_beams=num_beams         # Use configurable beam search
         )[0]['summary_text']
     
-    # Process the partition with minimal overhead
+    # [Rest of the function remains the same...]
     results = []
     
-    # Use tqdm for progress tracking
     with tqdm(total=len(partition_df), desc=f"Worker {worker_id}", position=worker_id) as pbar:
         for idx, row in partition_df.iterrows():
-            # Process the reviews by sentiment
             positive_reviews = row['Positive_Reviews'] if isinstance(row['Positive_Reviews'], list) else []
             negative_reviews = row['Negative_Reviews'] if isinstance(row['Negative_Reviews'], list) else []
             
-            # Generate summaries for both positive and negative reviews
             positive_summary = hierarchical_summary(positive_reviews) if positive_reviews else "No positive reviews available."
             negative_summary = hierarchical_summary(negative_reviews) if negative_reviews else "No negative reviews available."
             
             results.append((idx, positive_summary, negative_summary))
             
-            # Minimal cleanup - only every N iterations
             if len(results) % hardware_config['cleanup_frequency'] == 0 and torch.cuda.is_available():
                 torch.cuda.empty_cache()
                 
-            # Update progress bar
             pbar.update(1)
     
-    # Final cleanup
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
     
