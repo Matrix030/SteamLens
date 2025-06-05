@@ -46,7 +46,7 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
     dashboard_placeholder = st.empty()  # Add placeholder for dashboard link
     
     with progress_placeholder.container():
-        progress_bar = st.progress(0.0)
+        # progress_bar = st.progress(0.0)
         status_text = st.empty()
     
     # Load theme dictionary
@@ -118,9 +118,7 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             
             # Immediately display dashboard link for monitoring
             with dashboard_placeholder.container():
-                st.success("✅ Dask Processing Cluster Ready")
                 st.markdown(f"**[Open Dask Dashboard]({dashboard_link})** (opens in new tab)")
-                st.info("👁️ You can monitor processing tasks in real-time using this dashboard")
             
             # Store dashboard link in session state for later reference
             if 'process_dashboard_link' not in st.session_state:
@@ -390,7 +388,7 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             status_text.write(f"✅ Saved sentiment report to {DEFAULT_INTERIM_PATH}")
             
             # Complete the progress bar
-            progress_bar.progress(1.0)
+            # progress_bar.progress(1.0)
             
             # Calculate elapsed time for this phase
             phase_elapsed_time = time.time() - phase_start_time

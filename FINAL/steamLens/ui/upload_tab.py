@@ -51,7 +51,6 @@ def render_upload_tab() -> None:
                 
                 # Inform user that processing is starting
                 st.info("Dask cluster is being initialized. Processing will start shortly...")
-                st.info("The dashboard link will appear below once the cluster is ready.")
             
             # Process the files (note: moved outside the spinner to allow dashboard to show)
             result = process_uploaded_files(uploaded_files, themes_file=DEFAULT_THEME_FILE)
@@ -62,7 +61,6 @@ def render_upload_tab() -> None:
             
             if result:
                 st.session_state.result = result
-                st.success(f"✅ Processing completed in {elapsed_time:.2f} seconds!")
                 
                 # Display summary
                 st.subheader("Processing Summary")

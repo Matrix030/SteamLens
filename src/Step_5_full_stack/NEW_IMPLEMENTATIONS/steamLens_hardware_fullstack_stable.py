@@ -886,7 +886,6 @@ def main():
                     
                     # Inform user that processing is starting
                     st.info("Dask cluster is being initialized. Processing will start shortly...")
-                    st.info("The dashboard link will appear below once the cluster is ready.")
                 
                 # Process the files (note: moved outside the spinner to allow dashboard to show)
                 result = process_uploaded_files(uploaded_files)
@@ -936,7 +935,6 @@ def main():
                     
                     # Inform user that summarization is starting
                     st.info("Dask cluster is being initialized. Summarization will start shortly...")
-                    st.info("The dashboard link will appear below once the cluster is ready.")
                 
                 # Run summarization (note: moved outside the spinner to allow dashboard to show)
                 summarized_report = summarize_report(st.session_state.result['final_report'])
