@@ -23,17 +23,17 @@ STREAMLIT_PAGE_CONFIG = {
 
 # Default hardware configuration for summarization
 HARDWARE_CONFIG = {
-    'worker_count': 6,
-    'memory_per_worker': '3GB',
-    'gpu_batch_size': 96,
+    'worker_count': 8, #old - 6
+    'memory_per_worker': '4GB', #old - 3GB
+    'gpu_batch_size': 256, # old - 96
     'model_name': 'sshleifer/distilbart-cnn-12-6',
-    'chunk_size': 400,
-    'checkpoint_frequency': 25,
-    'cleanup_frequency': 10,
+    'chunk_size': 800, #old - 400
+    'checkpoint_frequency': 15, # old - 25
+    'cleanup_frequency': 3, # old - 10
     # Add these new parameters for longer summaries:
-    'max_summary_length': 300,  # Increase from default 60
-    'min_summary_length': 80,   # Increase from default 20
-    'num_beams': 4,            # Increase from 2 for better quality
+    'max_summary_length': 300,  # Increase from default 60, new - 300
+    'min_summary_length': 80,   # Increase from default 20, new 80
+    'num_beams': 6,            # Increase from old - 2 -new-er -  4 for better quality
 }
 
 # Default file and path settings

@@ -106,7 +106,7 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             # Start a local Dask cluster with dynamically determined resources
             cluster = LocalCluster(
                 n_workers=resources['worker_count'],
-                threads_per_worker=2,
+                threads_per_worker=4,
                 memory_limit=f"{resources['memory_per_worker']}GB"
             )
             client = Client(cluster)

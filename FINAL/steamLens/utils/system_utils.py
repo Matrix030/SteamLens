@@ -23,10 +23,10 @@ def get_system_resources():
         cpu_count = psutil.cpu_count(logical=True)  # Logical if physical not available
     
     # Use 70% of available memory for Dask, split across workers
-    dask_memory = int(total_memory * 0.7)
+    dask_memory = int(total_memory * 1) # old - 0.7
     
     # Determine optimal worker count (leave at least 1 core for system)
-    worker_count = max(1, cpu_count - 1)
+    worker_count = max(1, cpu_count) # old - (cpu_count - 1)
     
     # Memory per worker
     memory_per_worker = int(dask_memory / worker_count)
