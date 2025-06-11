@@ -52,7 +52,7 @@ APP_ID_BATCH_SIZES = {
     'very_large': 3,    # > 1000 app IDs
     'large': 5,         # > 500 app IDs
     'medium': 10,       # > 100 app IDs
-    'small': 20         # <= 100 app IDs
+    'small': 100         # <= 100 app IDs
 }
 
 # File size thresholds for blocksize determination
@@ -66,7 +66,7 @@ BLOCKSIZE_THRESHOLDS = {
 BLOCKSIZES = {
     'large': '16MB',
     'medium': '32MB',
-    'small': '64MB'
+    'small': '256MB' #old 64 MB
 }
 
 # Fields that might contain game name in Parquet files

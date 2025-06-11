@@ -70,7 +70,7 @@ def summarize_report(final_report: pd.DataFrame) -> Optional[pd.DataFrame]:
         
         # Create cluster with optimized settings - allow more workers (up to 6) for GPU processing
         # Previously this was limited to 2 for GPU, now allowing more
-        worker_count = max(hardware_config['worker_count'], 6 if gpu_available else 4)
+        worker_count = max(hardware_config['worker_count'], 4 if gpu_available else 4)
         
         cluster = LocalCluster(
             n_workers=worker_count, 
