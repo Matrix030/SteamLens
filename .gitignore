@@ -11,6 +11,8 @@ src/Step_4_modeling/likes_dislikes_model_BERT/bertinsights_dislikes.json
 src/Step_4_modeling/likes_dislikes_model_BERT/bertinsights_likes.json
 src/Step_4_modeling/per_app_model_BERT/models
 src/Step_4_modeling/per_app_model_BERT/outputs
+src/Step_4_modeling/final.ipynb
+src/Step_4_modeling/10_model_bert_yet.ipynb
 src/app_details_json
 src/app_details_json_2
 parquet_output_indie
