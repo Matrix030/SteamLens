@@ -12,7 +12,7 @@
 # 🎮 SteamLens: Advanced Sentiment Analysis for Steam Reviews
 
 SteamLens is a powerful, GPU-accelerated sentiment analysis and summarization tool designed for large-scale Steam game review processing. It uses distributed computing and advanced NLP techniques to separate positive and negative reviews, providing meaningful insights into what players love and hate about different game themes.
-![Example Output](Screenshot from 2025-06-11 10-35-24.png)
+![Example Output](output_example.png)
 ## ✨ Key Features
 
 - **Sentiment Separation**: Automatically separates positive and negative reviews for deeper insights
