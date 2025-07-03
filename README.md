@@ -196,9 +196,7 @@ Steam Reviews → Theme Classification → Sentiment Separation → AI Summariza
 ## ⚙️ Configuration for Production
 
 ### Hardware Recommendations
-- **Small Studio** (< 10K reviews): 16GB RAM, GTX 1660 or better
-- **Mid-size Studio** (10K-100K reviews): 32GB RAM, RTX 3070 or better  
-- **Large Publisher** (> 100K reviews): 64GB+ RAM, RTX 4090 or better
+- Will work on most hardware but a Nvidia GPU is required. The program check for the available resources and allocation is done automatically
 
 ### Performance Tuning
 ```python
@@ -229,7 +227,7 @@ HARDWARE_CONFIG = {
 - **Faster Response**: Address issues before competitors
 - **Player Retention**: Improve satisfaction through targeted fixes
 
-## 🛠️ Integration Options
+## 🛠️ Integration Options (Future Scope - Currently working on it)
 
 ### CI/CD Integration
 ```bash
@@ -255,8 +253,7 @@ Get automated reports sent to your development channels when sentiment changes s
 ### Minimum System Requirements
 - **Python**: 3.8+
 - **Memory**: 8GB RAM (16GB+ recommended)
-- **Storage**: 10GB+ free space for processing
-- **GPU**: Optional but recommended for large datasets
+- **GPU**: Required
 
 ### Data Requirements
 - Steam review data in Parquet format
