@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-topic_assignment.py - Topic assignment for Steam reviews
-Assigns reviews to themes using embedding similarity
-"""
+
 
 import numpy as np
 import pandas as pd
@@ -14,16 +11,7 @@ from sentence_transformers import SentenceTransformer
 
 def get_theme_embeddings(app_ids: List[int], game_themes: Dict[int, Dict[str, List[str]]], 
                          embedder: SentenceTransformer) -> Dict[int, np.ndarray]:
-    """Get theme embeddings for a specific set of app IDs
     
-    Args:
-        app_ids (list): List of app IDs to get embeddings for
-        game_themes (dict): Dictionary mapping app IDs to theme dictionaries
-        embedder (SentenceTransformer): Sentence transformer model for embeddings
-        
-    Returns:
-        dict: Dictionary mapping app IDs to arrays of theme embeddings
-    """
     # Move the model to the appropriate device
     import torch
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -42,16 +30,7 @@ def get_theme_embeddings(app_ids: List[int], game_themes: Dict[int, Dict[str, Li
 
 def assign_topic(df_partition: pd.DataFrame, game_themes: Dict[int, Dict[str, List[str]]], 
                  embedder: SentenceTransformer) -> pd.DataFrame:
-    """Assign topics using only theme embeddings for app IDs in this partition
     
-    Args:
-        df_partition (DataFrame): Partition of data to process
-        game_themes (dict): Dictionary mapping app IDs to theme dictionaries
-        embedder (SentenceTransformer): Sentence transformer model for embeddings
-        
-    Returns:
-        DataFrame: Original DataFrame with topic_id column added
-    """
     # If no rows, return as-is
     if df_partition.empty:
         df_partition['topic_id'] = []
