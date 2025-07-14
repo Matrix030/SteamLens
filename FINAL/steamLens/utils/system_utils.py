@@ -1,19 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-system_utils.py - System utilities for SteamLens
-Includes functions for resource detection and system configuration
-"""
+
 
 import psutil
 
 def get_system_resources():
-    """Dynamically determine system resources
     
-    Returns:
-        dict: Dictionary containing worker_count, memory_per_worker, and total_memory
-    """
     # Get available memory (in GB)
     total_memory = psutil.virtual_memory().total / (1024**3)
     
@@ -38,25 +31,11 @@ def get_system_resources():
     }
 
 def estimate_file_size(file):
-    """Estimate size of file in GB
     
-    Args:
-        file: The file object to estimate the size of
-        
-    Returns:
-        float: Size of the file in GB
-    """
     return file.size / (1024**3)  # Convert to GB
     
 def format_time(seconds):
-    """Format time in seconds to a human-readable string
     
-    Args:
-        seconds (float): Time in seconds
-        
-    Returns:
-        str: Formatted time string
-    """
     if seconds is None:
         return "Not completed"
     
