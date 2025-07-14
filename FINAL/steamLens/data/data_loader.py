@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-data_loader.py - Data loading and extraction utilities for SteamLens
-Includes functions for reading Parquet files and extracting metadata
-"""
+
 
 import os
 import streamlit as st
@@ -15,14 +12,7 @@ from typing import Tuple, Optional, List, Dict, Any
 from ..config.app_config import POTENTIAL_NAME_FIELDS, PARQUET_COLUMNS, BLOCKSIZE_THRESHOLDS, BLOCKSIZES, DEFAULT_LANGUAGE
 
 def extract_appid_and_name_from_parquet(file_path: str) -> Tuple[Optional[int], Optional[str]]:
-    """Extract appid and game name from a parquet file (Optimized with PyArrow)
     
-    Args:
-        file_path (str): Path to the Parquet file
-        
-    Returns:
-        tuple: (app_id, game_name) - Both may be None if extraction fails
-    """
     try:
         pf = pq.ParquetFile(file_path)
         
@@ -78,26 +68,12 @@ def extract_appid_and_name_from_parquet(file_path: str) -> Tuple[Optional[int], 
         return None, None
 
 def extract_appid_from_parquet(file_path: str) -> Optional[int]:
-    """Extract appid from a parquet file
     
-    Args:
-        file_path (str): Path to the Parquet file
-        
-    Returns:
-        int or None: The app ID or None if extraction fails
-    """
     app_id, _ = extract_appid_and_name_from_parquet(file_path)
     return app_id
 
 def determine_blocksize(file_size_gb: float) -> str:
-    """Determine appropriate blocksize based on file size
     
-    Args:
-        file_size_gb (float): File size in GB
-        
-    Returns:
-        str: Blocksize setting for Dask (e.g., '16MB')
-    """
     if file_size_gb > BLOCKSIZE_THRESHOLDS['large']:
         return BLOCKSIZES['large']
     elif file_size_gb > BLOCKSIZE_THRESHOLDS['medium']:
@@ -106,15 +82,7 @@ def determine_blocksize(file_size_gb: float) -> str:
         return BLOCKSIZES['small']
 
 def load_theme_dictionary(themes_file: str) -> Dict[int, Dict[str, List[str]]]:
-    """Load the theme dictionary from a JSON file
     
-    Args:
-        themes_file (str): Path to the themes JSON file
-        
-    Returns:
-        dict: Dictionary mapping app IDs to theme dictionaries
-              or empty dict if loading fails
-    """
     import json
     
     try:
