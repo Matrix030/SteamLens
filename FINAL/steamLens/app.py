@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-app.py - Main application file for SteamLens
-Integrates all components and provides the entry point
-"""
 
 import time
 import streamlit as st
