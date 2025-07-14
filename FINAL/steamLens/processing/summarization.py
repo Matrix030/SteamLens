@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-summarization.py - Sentiment-based summarization for Steam reviews
-Uses transformers to generate summaries of positive and negative reviews
-"""
 
 import torch
 import pandas as pd
@@ -14,22 +10,13 @@ from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
 from dask.distributed import Future
 
 def prepare_partition(start_idx: int, end_idx: int, final_report: pd.DataFrame) -> pd.DataFrame:
-    """Prepare a partition of the final report for processing
     
-    Args:
-        start_idx (int): Starting index of the partition
-        end_idx (int): Ending index of the partition
-        final_report (DataFrame): Complete report to partition
-        
-    Returns:
-        DataFrame: Partition of the report
-    """
     return final_report.iloc[start_idx:end_idx].copy()
 
 def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_config: Dict[str, Any], 
                      model_dataset_name: Optional[str] = None, 
                      tokenizer_dataset_name: Optional[str] = None) -> List[Tuple[int, str, str]]:
-    """Optimized worker for GPU processing with sentiment separation and configurable summary length"""
+    
     
     # Import needed packages
     from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
@@ -173,14 +160,7 @@ def process_partition(partition_df: pd.DataFrame, worker_id: int, hardware_confi
     return results
 
 def update_main_progress(futures: List[Any], progress_bar: Any, stop_flag: List[bool], final_report_length: int) -> None:
-    """Thread function to update the main progress bar
     
-    Args:
-        futures (list): List of Dask futures to monitor
-        progress_bar: Streamlit progress bar to update
-        stop_flag (list): Mutable flag to signal thread termination
-        final_report_length (int): Length of the final report (for progress calculation)
-    """
     import time
     start_time = time.time()
     
