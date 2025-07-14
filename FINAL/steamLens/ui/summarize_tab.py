@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-summarize_tab.py - UI for the Summarize tab
-Handles summarization of processed data
-"""
+
 
 import time
 import streamlit as st
@@ -13,10 +10,7 @@ from typing import Dict, Any
 from ..processing.summarize_processor import summarize_report
 
 def render_summarize_tab() -> None:
-    """Render the Summarize tab UI
     
-    Displays UI for generating sentiment summaries from processed data
-    """
     st.header("Generate Sentiment Summaries")
     st.write("""
     This step uses GPU-accelerated summarization to generate separate summaries for positive and negative reviews.
