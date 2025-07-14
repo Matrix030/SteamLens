@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-steamLens_sequential.py - Sequential Processing for Steam Reviews with Streamlit Frontend
-Non-distributed version of the SteamLens tool (without Dask)
-With execution time tracking for performance comparison
-"""
+
 
 import os
 import json
