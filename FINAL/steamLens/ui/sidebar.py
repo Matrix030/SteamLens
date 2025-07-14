@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-sidebar.py - UI for the sidebar
-Handles configuration, themes, and timing metrics
-"""
 
 import os
 import datetime
@@ -15,10 +11,7 @@ from ..config.app_config import DEFAULT_THEME_FILE
 from ..utils.system_utils import format_time
 
 def render_sidebar() -> None:
-    """Render the sidebar UI
     
-    Displays configuration options, theme file uploader, timing metrics, and dashboard links
-    """
     st.sidebar.header("Configuration")
     
     # Theme file uploader
@@ -64,11 +57,7 @@ def render_sidebar() -> None:
     """)
 
 def render_timing_metrics(timing_data: Dict[str, Any]) -> None:
-    """Render the timing metrics
     
-    Args:
-        timing_data (dict): Dictionary containing timing data
-    """
     st.sidebar.markdown("---")
     st.sidebar.header("⏱️ Execution Time Metrics")
     
