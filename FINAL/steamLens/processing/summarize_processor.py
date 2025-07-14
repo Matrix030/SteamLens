@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-summarize_processor.py - Sentiment-based summarization processor
-Manages the summarization of positive and negative reviews
-"""
+
 
 import time
 import threading
@@ -19,14 +16,7 @@ from ..config.app_config import HARDWARE_CONFIG, DEFAULT_OUTPUT_PATH
 from .summarization import prepare_partition, process_partition, update_main_progress
 
 def summarize_report(final_report: pd.DataFrame) -> Optional[pd.DataFrame]:
-    """Hardware-optimized GPU summarization phase with sentiment separation
     
-    Args:
-        final_report (DataFrame): Final report from the processing step
-        
-    Returns:
-        DataFrame or None: Summarized report with positive and negative summaries or None if summarization fails
-    """
     # Start phase timer for detailed timing
     phase_start_time = time.time()
     
