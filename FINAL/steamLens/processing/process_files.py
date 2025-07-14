@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-"""
-process_files.py - Main file processing functionality for SteamLens
-"""
+
 
 import os
 import time
@@ -23,15 +21,7 @@ from ..utils.system_utils import get_system_resources
 from .topic_assignment import assign_topic
 
 def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_themes.json") -> Optional[Dict[str, Any]]:
-    """Process uploaded parquet files with timing metrics and sentiment separation
     
-    Args:
-        uploaded_files (list): List of uploaded files
-        themes_file (str): Path to the themes JSON file
-        
-    Returns:
-        dict or None: Dictionary with processing results or None if processing fails
-    """
     # Start phase timer for more detailed timing
     phase_start_time = time.time()
     
