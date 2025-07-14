@@ -1,20 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-results_tab.py - UI for the Results tab
-Handles displaying and exporting the results
-"""
 
 import streamlit as st
 import pandas as pd
 from typing import Dict, List, Any
 
 def render_results_tab() -> None:
-    """Render the Results tab UI
     
-    Displays UI for viewing and downloading the analysis results
-    """
     st.header("Sentiment Analysis Results")
     
     # Check if we have summarized results
@@ -27,11 +20,7 @@ def render_results_tab() -> None:
         st.info("Please complete the 'Upload & Process' step first")
 
 def show_summarized_results(summarized_report: pd.DataFrame) -> None:
-    """Display the summarized results
     
-    Args:
-        summarized_report (DataFrame): DataFrame containing the summarized results
-    """
     # Get game name mapping if available
     game_name_mapping = {}
     if 'result' in st.session_state and 'game_name_mapping' in st.session_state.result:
@@ -105,11 +94,7 @@ def show_summarized_results(summarized_report: pd.DataFrame) -> None:
     render_download_buttons(summarized_report, with_summaries=True)
 
 def show_unsummarized_results(final_report: pd.DataFrame) -> None:
-    """Display the unsummarized results
     
-    Args:
-        final_report (DataFrame): DataFrame containing the unsummarized results
-    """
     # Get game name mapping if available
     game_name_mapping = {}
     if 'result' in st.session_state and 'game_name_mapping' in st.session_state.result:
@@ -181,13 +166,7 @@ def show_unsummarized_results(final_report: pd.DataFrame) -> None:
     render_download_buttons(final_report, with_summaries=False)
         
 def render_review_samples(theme_data: pd.DataFrame, review_column: str, title: str) -> None:
-    """Render sample reviews
     
-    Args:
-        theme_data (DataFrame): DataFrame containing the theme data
-        review_column (str): Name of the column containing the reviews
-        title (str): Title to display
-    """
     st.subheader(title)
     if (review_column in theme_data.columns and 
         isinstance(theme_data[review_column].iloc[0], list) and 
@@ -203,12 +182,7 @@ def render_review_samples(theme_data: pd.DataFrame, review_column: str, title: s
         st.write(f"No {review_column.lower()} available.")
 
 def render_download_buttons(report: pd.DataFrame, with_summaries: bool = False) -> None:
-    """Render download buttons for the reports
     
-    Args:
-        report (DataFrame): DataFrame containing the report data
-        with_summaries (bool): Whether the report contains summaries
-    """
     st.subheader("Download Reports")
     
     if with_summaries:
