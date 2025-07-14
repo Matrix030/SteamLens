@@ -11,7 +11,6 @@
 
 # 🎮 SteamLens: Game Developer Analytics Platform
 **Leveraged my RTX 4080 Super as a mini-cluster by using Dask's LocalCluster to parallelize multiple transformer instances on a single GPU for high-throughput inference**
-**Transform Steam reviews into actionable development insights**
 
 SteamLens is a specialized analytics platform that helps game developers understand what players really think about their games. Instead of manually reading thousands of reviews, get AI-powered insights organized by game themes—from gameplay mechanics to graphics, story, and performance. Know exactly what to fix, what to keep, and what players love most.
 
