@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-upload_tab.py - UI for the Upload tab
-Handles file uploading and initial processing
-"""
+
 
 import time
 import streamlit as st
@@ -15,10 +12,7 @@ from ..processing.process_files import process_uploaded_files
 from ..utils.system_utils import format_time
 
 def render_upload_tab() -> None:
-    """Render the Upload tab UI
     
-    Displays UI for uploading parquet files and starting the processing
-    """
     st.header("Upload and Process Parquet Files")
     st.write("""
     Upload your Steam reviews Parquet files for processing. The app will:
@@ -84,10 +78,6 @@ def render_upload_tab() -> None:
         st.info("Please upload one or more Parquet files containing Steam reviews data.")
 
 def check_theme_file_exists() -> bool:
-    """Check if the theme file exists
     
-    Returns:
-        bool: True if the theme file exists, False otherwise
-    """
     import os
     return os.path.exists(DEFAULT_THEME_FILE) 
