@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-app_config.py - Configuration parameters for SteamLens
-Contains constants, defaults, and configuration settings
-can change summarization limit here
-"""
-
 import os
 
 # Create directories if they don't exist
