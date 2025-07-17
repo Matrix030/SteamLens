@@ -9,14 +9,14 @@
  ╚═══════════════════════════════════════════════════════════════════════════════════════════╝
 ```
 
-# 🎮 SteamLens: Game Developer Analytics Platform
+# 🎮 steamLensAI: Game Developer Analytics Platform
 **Leveraged my RTX 4080 Super as a mini-cluster by using Dask's LocalCluster to parallelize multiple transformer instances on a single GPU for high-throughput inference**
 
-SteamLens is a specialized analytics platform that helps game developers understand what players really think about their games. Instead of manually reading thousands of reviews, get AI-powered insights organized by game themes—from gameplay mechanics to graphics, story, and performance. Know exactly what to fix, what to keep, and what players love most.
+steamLensAI is a specialized analytics platform that helps game developers understand what players really think about their games. Instead of manually reading thousands of reviews, get AI-powered insights organized by game themes—from gameplay mechanics to graphics, story, and performance. Know exactly what to fix, what to keep, and what players love most.
 
 ![Example Output](output_example.png)
 
-## 🎯 Why SteamLens?
+## 🎯 Why steamLensAI?
 
 ### For Game Developers
 - **Prioritize Development**: See which game aspects need immediate attention
@@ -67,7 +67,7 @@ Automatically categorizes reviews into relevant game themes:
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd steamLens
+cd steamLensAI
 
 # Install dependencies
 pip install -r requirements.txt
@@ -112,7 +112,7 @@ Create a `game_themes.json` file with themes relevant to your game(s):
 ### 4. Analyze Your Game
 
 1. **Upload**: Add your review data and theme definitions
-2. **Process**: Let SteamLens categorize and analyze reviews
+2. **Process**: Let steamLensAI categorize and analyze reviews
 3. **Insights**: Get actionable summaries for each theme
 4. **Export**: Download findings for team collaboration
 
@@ -236,7 +236,7 @@ python analyze_reviews.py --game-id 12345 --since-date 2024-01-01
 
 ### API for Custom Workflows
 ```python
-from steamlens import ReviewAnalyzer
+from steamLensAI import ReviewAnalyzer
 
 analyzer = ReviewAnalyzer(config="game_themes.json")
 insights = analyzer.analyze_game(app_id=12345)
@@ -297,13 +297,13 @@ We welcome contributions from game developers and data scientists:
 1. **Feature Requests**: What insights would help your development process?
 2. **Theme Definitions**: Share theme configurations for different game genres
 3. **Performance Optimizations**: Help us handle even larger datasets
-4. **Integration Examples**: Show how you use SteamLens in your workflow
+4. **Integration Examples**: Show how you use steamLensAI in your workflow
 
 ## 📞 Support
 
 ### For Game Developers
 - **Documentation**: Comprehensive guides for non-technical users
-- **Community Forum**: Connect with other developers using SteamLens
+- **Community Forum**: Connect with other developers using steamLensAI
 - **Consulting**: Custom implementation for complex requirements
 
 ### Technical Support
