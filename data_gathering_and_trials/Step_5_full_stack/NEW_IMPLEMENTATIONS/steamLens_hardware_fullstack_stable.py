@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-steamLens_sentiment_analysis.py - Big Data Processing for Steam Reviews with Sentiment Separation
+steamLensAI_sentiment_analysis.py - Big Data Processing for Steam Reviews with Sentiment Separation
 Splits summaries into positive and negative review analyses for better insights
 Includes comprehensive timing functionality and dashboard monitoring
 """
@@ -30,7 +30,7 @@ import pyarrow.parquet as pq
 
 # Set page configuration
 st.set_page_config(
-    page_title="SteamLens - Sentiment Analysis",
+    page_title="steamLensAI - Sentiment Analysis",
     page_icon="🎮",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -829,7 +829,7 @@ def main():
             'global_end_time': None
         }
     
-    st.title("🎮 SteamLens: Sentiment Analysis for Steam Reviews")
+    st.title("🎮 steamLensAI: Sentiment Analysis for Steam Reviews")
     st.write("This tool separates positive and negative reviews for deeper insights into what players love and hate.")
     
     # Sidebar for configuration
@@ -1060,7 +1060,7 @@ def main():
                 st.download_button(
                     label="📥 Download Full Sentiment Report (CSV)",
                     data=csv,
-                    file_name='steamlens_sentiment_report.csv',
+                    file_name='steamLensAI_sentiment_report.csv',
                     mime='text/csv',
                 )
             
@@ -1072,7 +1072,7 @@ def main():
                 st.download_button(
                     label="📥 Download Simplified Report (CSV)",
                     data=simple_csv,
-                    file_name='steamlens_sentiment_summary.csv',
+                    file_name='steamLensAI_sentiment_summary.csv',
                     mime='text/csv',
                 )
             
@@ -1170,7 +1170,7 @@ def main():
             st.download_button(
                 label="📥 Download Basic Sentiment Report (CSV)",
                 data=csv,
-                file_name='steamlens_basic_sentiment_report.csv',
+                file_name='steamLensAI_basic_sentiment_report.csv',
                 mime='text/csv',
             )
         else:
@@ -1244,7 +1244,7 @@ def main():
     # Footer
     st.sidebar.markdown("---")
     st.sidebar.info("""
-    **SteamLens Sentiment Analysis** processes Steam reviews to identify what players love and hate about each theme.
+    **steamLensAI Sentiment Analysis** processes Steam reviews to identify what players love and hate about each theme.
     Separating positive and negative reviews provides clearer insights into player sentiment.
     """)
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-steamLens.py - Big Data Processing for Steam Reviews with Streamlit Frontend
+steamLensAI.py - Big Data Processing for Steam Reviews with Streamlit Frontend
 Dynamic resource allocation and hardware-optimized processing with interactive UI
 """
 
@@ -28,7 +28,7 @@ from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
 
 # Set page configuration
 st.set_page_config(
-    page_title="SteamLens - Big Data Analysis",
+    page_title="steamLensAI - Big Data Analysis",
     page_icon="🎮",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -862,7 +862,7 @@ def summarize_report(final_report):
 
 def main():
     """Main Streamlit UI"""
-    st.title("🎮 SteamLens: Steam Reviews Analysis Tool")
+    st.title("🎮 steamLensAI: Steam Reviews Analysis Tool")
     
     # Sidebar for configuration
     st.sidebar.header("Configuration")
@@ -1037,7 +1037,7 @@ def main():
             st.download_button(
                 label="📥 Download Full Report as CSV",
                 data=csv,
-                file_name='steamlens_report.csv',
+                file_name='steamLensAI_report.csv',
                 mime='text/csv',
             )
         elif 'result' in st.session_state and st.session_state.result:
@@ -1085,7 +1085,7 @@ def main():
             st.download_button(
                 label="📥 Download Basic Report as CSV",
                 data=csv,
-                file_name='steamlens_basic_report.csv',
+                file_name='steamLensAI_basic_report.csv',
                 mime='text/csv',
             )
         else:
@@ -1094,7 +1094,7 @@ def main():
     # Footer
     st.sidebar.markdown("---")
     st.sidebar.info("""
-    **SteamLens** processes Steam reviews to identify themes and summarize sentiment.
+    **steamLensAI** processes Steam reviews to identify themes and summarize sentiment.
     Developed with dynamic resource allocation and hardware-optimized processing.
     """)
 

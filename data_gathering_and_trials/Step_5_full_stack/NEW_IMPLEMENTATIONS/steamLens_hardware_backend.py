@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-steamLens.py - Big Data Processing for Steam Reviews
+steamLensAI.py - Big Data Processing for Steam Reviews
 Dynamic resource allocation and hardware-optimized processing
 """
 
@@ -549,7 +549,7 @@ def summarization_phase(final_report=None):
 def main():
     """Main execution function"""
     print("=" * 80)
-    print("SteamLens: Big Data Processing for Steam Reviews")
+    print("steamLensAI: Big Data Processing for Steam Reviews")
     print("=" * 80)
     
     # Ask user if they want to run data processing
@@ -566,7 +566,7 @@ def main():
         print("\nStarting hardware-optimized summarization phase...")
         summarization_phase(final_report)
     
-    print("\nSteamLens processing complete!")
+    print("\nsteamLensAI processing complete!")
 
 if __name__ == "__main__":
     main()
