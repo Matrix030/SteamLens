@@ -265,10 +265,10 @@ print(table.schema.metadata)
 - **Data Preservation**: No data loss during conversion
 - **Type Safety**: Proper handling of mixed data types
 
-## 📝 Integration with SteamLens
+## 📝 Integration with steamLensAI
 
 ### Preparation for Analysis
-The converted Parquet files are optimized for use with the main SteamLens application:
+The converted Parquet files are optimized for use with the main steamLensAI application:
 
 1. **Compatible Schema**: Matches expected column names and types
 2. **Efficient Loading**: Fast loading with Dask DataFrames
@@ -311,8 +311,8 @@ python getAppDetails.py
 cd ../Step_2_parquet_conversion/
 python dask_json_to_parquet.py
 
-# Step 3: Run SteamLens analysis
-cd ../../steamLens/
+# Step 3: Run steamLensAI analysis
+cd ../../steamLensAI/
 streamlit run app.py
 ```
 
