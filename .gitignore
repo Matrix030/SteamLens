@@ -16,10 +16,9 @@ data_gathering_and_trials/Step_4_modeling/dask_ml_trial/10_model_bert_yet.ipynb
 data_gathering_and_trials/app_details_json
 data_gathering_and_trials/app_details_json_2
 parquet_output_indie
-FINAL/parquet_output_theme_combo
+
 BDA.zip
-FINAL/output_csvs
-FINAL/output
+
 FOR_GROUP
 
 # Python related ignores
@@ -45,16 +44,5 @@ wheels/
 *.egg
 
 # stemlens specific ignores
-FINAL/stemlens/**/__pycache__/
-FINAL/stemlens/**/*.py[cod]
-FINAL/stemlens/**/*.so
-FINAL/stemlens/**/*.egg-info/
-FINAL/stemlens/build/
-FINAL/stemlens/dist/
-stemlens/**/__pycache__/
-stemlens/**/*.py[cod]
-stemlens/**/*.so
-stemlens/**/*.egg-info/
-stemlens/build/
-stemlens/dist/
-FINAL/stemlens/processing/__pycache__
+stemlensAI/**/__pycache__/
+.gitignore
