@@ -1,10 +1,10 @@
-# 🚀 SteamLens Full-Stack Implementations
+# 🚀 steamLensAI Full-Stack Implementations
 
-This directory contains advanced, production-ready implementations of the SteamLens sentiment analysis platform with comprehensive hardware optimization, dynamic resource allocation, and GPU acceleration capabilities.
+This directory contains advanced, production-ready implementations of the steamLensAI sentiment analysis platform with comprehensive hardware optimization, dynamic resource allocation, and GPU acceleration capabilities.
 
 ## 📁 Implementation Overview
 
-The full-stack implementations represent the evolution of SteamLens from prototype to production-ready system, featuring:
+The full-stack implementations represent the evolution of steamLensAI from prototype to production-ready system, featuring:
 
 - **Dynamic Hardware Detection**: Automatic system resource optimization
 - **GPU Acceleration**: CUDA-optimized processing with fallback to CPU
@@ -17,7 +17,7 @@ The full-stack implementations represent the evolution of SteamLens from prototy
 
 ### 1. Core Backend Scripts
 
-#### `steamLens_hardware_backend.py`
+#### `steamLensAI_hardware_backend.py`
 **Purpose**: Command-line backend engine with hardware optimization
 
 **Key Features**:
@@ -29,7 +29,7 @@ The full-stack implementations represent the evolution of SteamLens from prototy
 
 **Usage**:
 ```bash
-python steamLens_hardware_backend.py
+python steamLensAI_hardware_backend.py
 ```
 
 **Best For**: 
@@ -39,7 +39,7 @@ python steamLens_hardware_backend.py
 
 ---
 
-#### `steamLens_hardware_backend.ipynb`
+#### `steamLensAI_hardware_backend.ipynb`
 **Purpose**: Jupyter notebook version with cell-by-cell execution
 
 **Key Features**:
@@ -51,7 +51,7 @@ python steamLens_hardware_backend.py
 
 **Usage**:
 ```bash
-jupyter notebook steamLens_hardware_backend.ipynb
+jupyter notebook steamLensAI_hardware_backend.ipynb
 ```
 
 **Best For**:
@@ -64,7 +64,7 @@ jupyter notebook steamLens_hardware_backend.ipynb
 
 ### 2. Full-Stack Web Applications
 
-#### `steamLens_hardware_fullstack.py`
+#### `steamLensAI_hardware_fullstack.py`
 **Purpose**: Complete web application with basic sentiment analysis
 
 **Key Features**:
@@ -76,7 +76,7 @@ jupyter notebook steamLens_hardware_backend.ipynb
 
 **Usage**:
 ```bash
-streamlit run steamLens_hardware_fullstack.py
+streamlit run steamLensAI_hardware_fullstack.py
 ```
 
 **Best For**:
@@ -86,7 +86,7 @@ streamlit run steamLens_hardware_fullstack.py
 
 ---
 
-#### `steamLens_hardware_fullstack_stable.py` ⭐ **RECOMMENDED**
+#### `steamLensAI_hardware_fullstack_stable.py` ⭐ **RECOMMENDED**
 **Purpose**: Production-ready application with advanced sentiment separation
 
 **Key Features**:
@@ -99,7 +99,7 @@ streamlit run steamLens_hardware_fullstack.py
 
 **Usage**:
 ```bash
-streamlit run steamLens_hardware_fullstack_stable.py
+streamlit run steamLensAI_hardware_fullstack_stable.py
 ```
 
 **Best For**:
@@ -134,7 +134,7 @@ streamlit run gpu_mem_optimization.py
 
 ### 3. Resource-Adaptive Implementations
 
-#### `steamLens_resourcebased_backend.py/ipynb`
+#### `steamLensAI_resourcebased_backend.py/ipynb`
 **Purpose**: Dynamic resource allocation with intelligent scaling
 
 **Key Features**:
@@ -155,10 +155,10 @@ streamlit run gpu_mem_optimization.py
 **Usage**:
 ```bash
 # Backend version
-python steamLens_resourcebased_backend.py
+python steamLensAI_resourcebased_backend.py
 
 # Full-stack version
-streamlit run steamLens_resourcebased_fullstack.py
+streamlit run steamLensAI_resourcebased_fullstack.py
 ```
 
 **Best For**:
@@ -193,8 +193,8 @@ streamlit run steamLens_resourcebased_fullstack.py
 ### 1. Environment Setup
 ```bash
 # Create virtual environment
-python -m venv steamlens_env
-source steamlens_env/bin/activate  # On Windows: steamlens_env\Scripts\activate
+python -m venv steamLensAI_env
+source steamLensAI_env/bin/activate  # On Windows: steamLensAI_env\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -215,10 +215,10 @@ Upload or create `game_themes.json`:
 ### 3. Launch Application
 ```bash
 # For production use (recommended)
-streamlit run steamLens_hardware_fullstack_stable.py
+streamlit run steamLensAI_hardware_fullstack_stable.py
 
 # For resource-constrained environments
-streamlit run steamLens_resourcebased_fullstack.py
+streamlit run steamLensAI_resourcebased_fullstack.py
 
 # For high-performance setups
 streamlit run gpu_mem_optimization.py
@@ -363,7 +363,7 @@ RUN pip install -r requirements.txt
 COPY . .
 EXPOSE 8501
 
-CMD ["streamlit", "run", "steamLens_hardware_fullstack_stable.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "steamLensAI_hardware_fullstack_stable.py", "--server.port=8501", "--server.address=0.0.0.0"]
 ```
 
 ### Cloud Deployment Considerations
@@ -374,4 +374,4 @@ CMD ["streamlit", "run", "steamLens_hardware_fullstack_stable.py", "--server.por
 
 ---
 
-**💡 Pro Tip**: Start with `steamLens_hardware_fullstack_stable.py` for most use cases. It provides the best balance of features, stability, and performance while being easy to deploy and maintain.
+**💡 Pro Tip**: Start with `steamLensAI_hardware_fullstack_stable.py` for most use cases. It provides the best balance of features, stability, and performance while being easy to deploy and maintain.
