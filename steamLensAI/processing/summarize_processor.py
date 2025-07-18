@@ -58,7 +58,7 @@ def _setup_dask_cluster(gpu_available: bool, memory_limit: str, status_text: Any
                        dashboard_placeholder: Any) -> Tuple[LocalCluster, Client]:
     """Set up Dask cluster with optimized settings."""
     # Allow more workers (up to 6) for GPU processing
-    worker_count = max(HARDWARE_CONFIG['worker_count'], 4 if gpu_available else 4)
+    worker_count = max(HARDWARE_CONFIG['worker_count'],8 if gpu_available else 4)
     
     cluster = LocalCluster(
         n_workers=worker_count, 
