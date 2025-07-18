@@ -1,501 +1,559 @@
 #!/usr/bin/env python3
 
 import os
+import gc
 import time
 import numpy as np
 import pandas as pd
 import tempfile
 import datetime
 import streamlit as st
+import dask
 import dask.dataframe as dd
 from typing import Dict, List, Tuple, Any, Optional
-from dask.distributed import Client, LocalCluster
+from dask.distributed import Client, LocalCluster, as_completed
 from sentence_transformers import SentenceTransformer
+from pathlib import Path
+import shutil
+import torch
+from dask import delayed
 
 from ..config.app_config import (SENTENCE_TRANSFORMER_MODEL, PARQUET_COLUMNS, 
-                                DEFAULT_LANGUAGE, APP_ID_BATCH_SIZES, DEFAULT_INTERIM_PATH)
+                                DEFAULT_LANGUAGE, DEFAULT_INTERIM_PATH, PROCESSING_CONFIG)
 from ..data.data_loader import extract_appid_and_name_from_parquet, determine_blocksize
 from ..utils.system_utils import get_system_resources
 from .topic_assignment import assign_topic
 
+# Try to import monitoring utilities, but make them optional
+try:
+    from ..utils.dask_monitor import DaskMonitor, create_progress_tracker, update_progress_tracker, display_performance_summary
+    MONITORING_AVAILABLE = True
+except ImportError:
+    MONITORING_AVAILABLE = False
+    # Create dummy functions if monitoring is not available
+    class DaskMonitor:
+        def __init__(self, client):
+            self.client = client
+            self.start_time = time.time()
+        
+        def log_task_completion(self, *args, **kwargs):
+            pass
+        
+        def display_cluster_metrics(self, *args, **kwargs):
+            pass
+        
+        def get_performance_summary(self):
+            return {}
+        
+        def estimate_completion_time(self, completed, total):
+            return None
+    
+    def create_progress_tracker(total_chunks, placeholder):
+        progress_bar = placeholder.progress(0.0)
+        status_text = placeholder.empty()
+        return {
+            'progress_bar': progress_bar,
+            'status_text': status_text,
+            'chunks_metric': None,
+            'rows_metric': None,
+            'time_metric': None,
+            'eta_metric': None
+        }
+    
+    def update_progress_tracker(tracker, completed, total_chunks, total_rows, monitor):
+        progress = completed / total_chunks if total_chunks > 0 else 0
+        tracker['progress_bar'].progress(progress)
+        tracker['status_text'].write(f"Processing chunk {completed}/{total_chunks} ({total_rows:,} rows)")
+    
+    def display_performance_summary(monitor, container):
+        container.success("Processing complete!")
 
-def _validate_uploaded_files(uploaded_files: List[Any]) -> bool:
-    """Validate that files were uploaded."""
+# Add the monitoring integration to the main processing function
+def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_themes.json") -> Optional[Dict[str, Any]]:
+    """Process uploaded files using Dask parallel chunk processing with monitoring"""
+    
+    # Start phase timer
+    phase_start_time = time.time()
+    
     if not uploaded_files:
         st.warning("Please upload at least one Parquet file to begin processing.")
-        return False
-    return True
-
-
-def _create_progress_indicators() -> Tuple[Any, Any, Any]:
-    """Create and return progress indicator placeholders."""
-    progress_placeholder = st.empty()
-    status_placeholder = st.empty()
-    dashboard_placeholder = st.empty()
+        return None
     
-    with progress_placeholder.container():
+    # Create layout for progress monitoring
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        progress_placeholder = st.empty()
+        status_placeholder = st.empty()
+    
+    with col2:
+        dashboard_placeholder = st.empty()
+        metrics_placeholder = st.empty()
+    
+    # Initial status
+    with status_placeholder.container():
         status_text = st.empty()
     
-    return progress_placeholder, status_placeholder, dashboard_placeholder, status_text
-
-
-def _load_game_themes(themes_file: str, status_text: Any) -> Optional[Dict]:
-    """Load the game themes dictionary."""
+    # Load theme dictionary
     try:
         from ..data.data_loader import load_theme_dictionary
         GAME_THEMES = load_theme_dictionary(themes_file)
         if not GAME_THEMES:
             return None
         status_text.write(f"✅ Loaded theme dictionary with {len(GAME_THEMES)} games")
-        return GAME_THEMES
     except Exception as e:
         st.error(f"Error loading theme dictionary: {str(e)}")
         return None
-
-
-def _process_and_validate_files(uploaded_files: List[Any], temp_dir: str, 
-                               GAME_THEMES: Dict, status_text: Any) -> Tuple[List, List, Dict]:
-    """Process uploaded files and validate against theme dictionary."""
-    valid_files = []
-    skipped_files = []
-    game_name_mapping = {}
     
-    for uploaded_file in uploaded_files:
-        file_path = os.path.join(temp_dir, uploaded_file.name)
+    # Create temporary storage
+    temp_paths = create_temp_storage()
+    status_text.write("✅ Created temporary storage for chunk processing")
+    
+    # Initialize Dask cluster
+    cluster = None
+    client = None
+    
+    try:
+        # Get processing configuration
+        config = PROCESSING_CONFIG
         
-        # Save the uploaded file
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+        # Display system configuration
+        with metrics_placeholder.container():
+            from ..config.app_config import display_system_config
+            st.info(display_system_config())
         
-        # Extract app ID and game name and check if it's in the theme dictionary
-        app_id, game_name = extract_appid_and_name_from_parquet(file_path)
+        # Create LocalCluster optimized for the system
+        status_text.write(f"Starting Dask cluster with {config['n_workers']} workers...")
         
-        if app_id and app_id in GAME_THEMES:
-            valid_files.append((file_path, app_id))
-            if game_name:
-                game_name_mapping[app_id] = game_name
-            status_text.write(f"✅ File '{uploaded_file.name}' has app ID {app_id} - Processing")
-        else:
-            skipped_files.append((uploaded_file.name, app_id))
-            status_text.write(f"⚠️ File '{uploaded_file.name}' has app ID {app_id} - Skipping (not in theme dictionary)")
-    
-    return valid_files, skipped_files, game_name_mapping
-
-
-def _setup_dask_cluster(resources: Dict, status_text: Any, dashboard_placeholder: Any) -> Tuple[LocalCluster, Client]:
-    """Set up Dask cluster with appropriate resources."""
-    cluster = LocalCluster(
-        n_workers=resources['worker_count'],
-        threads_per_worker=4,
-        memory_limit=f"{resources['memory_per_worker']}GB"
-    )
-    client = Client(cluster)
-    dashboard_link = client.dashboard_link
-    status_text.write(f"Dask dashboard initialized")
-    
-    # Store client in session state for potential reset
-    st.session_state.process_client = client
-    
-    # Display dashboard link
-    with dashboard_placeholder.container():
-        st.markdown(f"**[Open Dask Dashboard]({dashboard_link})** (opens in new tab)")
-    
-    # Store dashboard link in session state
-    if 'process_dashboard_link' not in st.session_state:
-        st.session_state.process_dashboard_link = dashboard_link
-    
-    return cluster, client
-
-
-def _initialize_embedder(client: Client, status_text: Any) -> str:
-    """Initialize and publish the sentence embedder to all workers."""
-    status_text.write(f"Initializing sentence embedder: {SENTENCE_TRANSFORMER_MODEL}")
-    
-    # Set device to CPU explicitly to avoid CUDA tensor serialization issues
-    embedder = SentenceTransformer(SENTENCE_TRANSFORMER_MODEL, device='cpu')
-    
-    # Ensure all model parameters are on CPU before sharing
-    for param in embedder.parameters():
-        if hasattr(param, 'data') and hasattr(param.data, 'cpu'):
-            param.data = param.data.cpu()
-    
-    # Create a unique name for the model dataset
-    model_dataset_name = f"embedder_dataset_{int(time.time())}"
-    
-    # Publish the embedder to all workers
-    client.publish_dataset(embedder, name=model_dataset_name)
-    status_text.write(f"✅ Sentence embedder published to all workers with dataset name: {model_dataset_name}")
-    
-    return model_dataset_name
-
-
-def _read_and_filter_files(valid_files: List[Tuple[str, int]], status_text: Any) -> Tuple[List[dd.DataFrame], int]:
-    """Read parquet files and apply initial filtering."""
-    all_ddfs = []
-    total_rows = 0
-    
-    for file_path, app_id in valid_files:
-        file_name = os.path.basename(file_path)
-        status_text.write(f"Processing file: {file_name} (App ID: {app_id})")
-        
-        rows_here = 0
-        # Determine blocksize based on file size
-        file_size = os.path.getsize(file_path) / (1024**3)  # in GB
-        blocksize = determine_blocksize(file_size)
-        
-        status_text.write(f"Using blocksize: {blocksize} for {file_size:.2f}GB file")
-        
-        # Read the parquet file with Dask
-        try:
-            ddf = dd.read_parquet(
-                file_path,
-                columns=PARQUET_COLUMNS,
-                blocksize=blocksize
-            )
-            
-            # Filter & Clean Data
-            ddf = ddf[ddf['review_language'] == DEFAULT_LANGUAGE]
-            ddf = ddf.dropna(subset=['review'])
-            # Only include matching app_id
-            ddf = ddf[ddf['steam_appid'] == app_id]
-            
-            # Get the total number of reviews being processed
-            rows_here = ddf.map_partitions(len).compute().sum()
-            total_rows += rows_here
-            all_ddfs.append(ddf)
-            status_text.write(f"Added file to processing queue: {file_name}")
-            
-        except Exception as e:
-            status_text.write(f"⚠️ Error processing file {file_name}: {str(e)}")
-    
-    return all_ddfs, total_rows
-
-
-def _apply_topic_assignment(combined_ddf: dd.DataFrame, GAME_THEMES: Dict, 
-                           model_dataset_name: str, status_text: Any) -> dd.DataFrame:
-    """Apply topic assignment to the combined dataframe."""
-    status_text.write("Assigning topics to reviews...")
-    meta = combined_ddf._meta.assign(topic_id=np.int64())
-    
-    # Create a function that includes GAME_THEMES and the model_dataset_name
-    def assign_topic_with_context(df_partition):
-        from dask.distributed import get_worker
-        # Get the worker's client to access the dataset
-        worker = get_worker()
-        # Get the model from the published dataset
-        embedder = worker.client.get_dataset(model_dataset_name)
-        # Now process with the actual model instance
-        return assign_topic(df_partition, GAME_THEMES, embedder)
-    
-    return combined_ddf.map_partitions(assign_topic_with_context, meta=meta)
-
-
-def _determine_batch_size(total_app_ids: int) -> int:
-    """Determine appropriate batch size based on number of app IDs."""
-    if total_app_ids > 1000:  # Very large number of app IDs
-        return APP_ID_BATCH_SIZES['very_large']
-    elif total_app_ids > 500:  # Medium-large number
-        return APP_ID_BATCH_SIZES['large']
-    elif total_app_ids > 100:  # Medium number
-        return APP_ID_BATCH_SIZES['medium']
-    else:  # Smaller number
-        return APP_ID_BATCH_SIZES['small']
-
-
-def _process_batch(batch_app_ids: List[int], ddf_with_topic: dd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Process a batch of app IDs and return aggregated results."""
-    # Filter data for this batch of app IDs
-    batch_ddf = ddf_with_topic[ddf_with_topic['steam_appid'].isin(batch_app_ids)]
-    
-    # Aggregate for this batch
-    agg = batch_ddf.groupby(['steam_appid', 'topic_id']).agg(
-        review_count=('review', 'count'),
-        likes_sum=('voted_up', 'sum')
-    )
-    
-    # Collect positive reviews for this batch
-    positive_reviews_series = batch_ddf[batch_ddf['voted_up']].groupby(['steam_appid', 'topic_id'])['review'] \
-        .apply(lambda x: list(x), meta=('review', object))
-    
-    # Collect negative reviews for this batch
-    negative_reviews_series = batch_ddf[~batch_ddf['voted_up']].groupby(['steam_appid', 'topic_id'])['review'] \
-        .apply(lambda x: list(x), meta=('review', object))
-    
-    # Compute all in parallel
-    agg_df, positive_reviews_df, negative_reviews_df = dd.compute(
-        agg, positive_reviews_series, negative_reviews_series
-    )
-    
-    # Convert to DataFrames
-    agg_df = agg_df.reset_index()
-    
-    # Calculate dislikes after computation
-    agg_df['dislikes_sum'] = agg_df['review_count'] - agg_df['likes_sum']
-    
-    # Process positive reviews
-    if not positive_reviews_df.empty:
-        positive_reviews_df = positive_reviews_df.reset_index().rename(columns={'review': 'Positive_Reviews'})
-    else:
-        positive_reviews_df = pd.DataFrame()
-    
-    # Process negative reviews  
-    if not negative_reviews_df.empty:
-        negative_reviews_df = negative_reviews_df.reset_index().rename(columns={'review': 'Negative_Reviews'})
-    else:
-        negative_reviews_df = pd.DataFrame()
-    
-    return agg_df, positive_reviews_df, negative_reviews_df
-
-
-def _process_app_ids_in_batches(unique_app_ids: List[int], ddf_with_topic: dd.DataFrame, 
-                                batch_size: int, status_text: Any) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Process app IDs in batches and return combined results."""
-    all_agg_dfs = []
-    all_positive_review_dfs = []
-    all_negative_review_dfs = []
-    
-    # Create a progress bar for batch processing
-    batch_progress = st.progress(0.0)
-    
-    # Process in dynamically sized batches
-    for i in range(0, len(unique_app_ids), batch_size):
-        batch_progress.progress(i / len(unique_app_ids))
-        batch_app_ids = unique_app_ids[i:i+batch_size]
-        
-        agg_df, positive_reviews_df, negative_reviews_df = _process_batch(batch_app_ids, ddf_with_topic)
-        
-        # Append results
-        all_agg_dfs.append(agg_df)
-        if not positive_reviews_df.empty:
-            all_positive_review_dfs.append(positive_reviews_df)
-        if not negative_reviews_df.empty:
-            all_negative_review_dfs.append(negative_reviews_df)
-        
-        status_text.write(f"Processed batch {i//batch_size + 1}/{(len(unique_app_ids) + batch_size - 1)//batch_size}")
-    
-    # Complete the batch progress
-    batch_progress.progress(1.0)
-    
-    # Combine results
-    status_text.write("Combining results...")
-    agg_df = pd.concat(all_agg_dfs) if all_agg_dfs else pd.DataFrame()
-    positive_reviews_df = pd.concat(all_positive_review_dfs) if all_positive_review_dfs else pd.DataFrame()
-    negative_reviews_df = pd.concat(all_negative_review_dfs) if all_negative_review_dfs else pd.DataFrame()
-    
-    return agg_df, positive_reviews_df, negative_reviews_df
-
-
-def _merge_results(agg_df: pd.DataFrame, positive_reviews_df: pd.DataFrame, 
-                  negative_reviews_df: pd.DataFrame) -> pd.DataFrame:
-    """Merge aggregation results with sentiment-specific reviews."""
-    # First, merge aggregation with positive reviews
-    if not positive_reviews_df.empty:
-        report_df = pd.merge(
-            agg_df,
-            positive_reviews_df,
-            on=['steam_appid', 'topic_id'],
-            how='left'
+        cluster = LocalCluster(
+            n_workers=config['n_workers'],
+            threads_per_worker=config['threads_per_worker'],
+            memory_limit=config['memory_per_worker'],
+            processes=True,  # Use processes for better memory isolation
+            dashboard_address=':8787'  # Standard dashboard port
         )
-    else:
-        report_df = agg_df.copy()
-        report_df['Positive_Reviews'] = None
-    
-    # Then, merge with negative reviews
-    if not negative_reviews_df.empty:
-        report_df = pd.merge(
-            report_df,
-            negative_reviews_df,
-            on=['steam_appid', 'topic_id'],
-            how='left'
-        )
-    else:
-        report_df['Negative_Reviews'] = None
-    
-    return report_df
-
-
-def _get_theme_name_safely(row: pd.Series, themes_dict: Dict) -> str:
-    """Helper function to get theme name safely."""
-    appid = int(row['steam_appid'])
-    tid = int(row['topic_id'])
-    if appid in themes_dict:
-        theme_keys = list(themes_dict[appid].keys())
-        if 0 <= tid < len(theme_keys):
-            return theme_keys[tid]
-        else:
-            return f"Unknown Theme {tid} (Index out of bounds)"
-    else:
-        return f"Unknown Theme {tid} (AppID not in themes)"
-
-
-def _build_final_report(report_df: pd.DataFrame, GAME_THEMES: Dict) -> pd.DataFrame:
-    """Build the final report with all required columns."""
-    if report_df.empty:
-        # Return empty dataframe with correct columns
-        return pd.DataFrame(columns=[
-            'steam_appid', 'Theme', '#Reviews', 'Positive', 'Negative',
-            'LikeRatio', 'DislikeRatio', 'Positive_Reviews', 'Negative_Reviews'
-        ])
-    
-    # Apply theme names
-    report_df['Theme'] = report_df.apply(lambda row: _get_theme_name_safely(row, GAME_THEMES), axis=1)
-    
-    # Vectorized calculations for ratios
-    report_df['#Reviews'] = report_df['review_count'].astype(int)
-    report_df['Positive'] = report_df['likes_sum'].astype(int)
-    report_df['Negative'] = report_df['dislikes_sum'].astype(int)
-    
-    # Calculate ratios
-    report_df['LikeRatio'] = '0.0%'
-    report_df.loc[report_df['#Reviews'] > 0, 'LikeRatio'] = \
-        (report_df['Positive'] / report_df['#Reviews'] * 100).round(1).astype(str) + '%'
-    
-    report_df['DislikeRatio'] = '0.0%'
-    report_df.loc[report_df['#Reviews'] > 0, 'DislikeRatio'] = \
-        (report_df['Negative'] / report_df['#Reviews'] * 100).round(1).astype(str) + '%'
-    
-    # Select and rename columns for the final report
-    final_report = report_df[[
-        'steam_appid',
-        'Theme',
-        '#Reviews',
-        'Positive',
-        'Negative',
-        'LikeRatio',
-        'DislikeRatio',
-        'Positive_Reviews',
-        'Negative_Reviews'
-    ]].copy()
-    
-    final_report['steam_appid'] = final_report['steam_appid'].astype(int)
-    
-    # Ensure review columns are lists
-    final_report['Positive_Reviews'] = final_report['Positive_Reviews'].apply(
-        lambda x: x if isinstance(x, list) else []
-    )
-    final_report['Negative_Reviews'] = final_report['Negative_Reviews'].apply(
-        lambda x: x if isinstance(x, list) else []
-    )
-    
-    return final_report
-
-
-def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_themes.json") -> Optional[Dict[str, Any]]:
-    """Main function to process uploaded parquet files."""
-    # Start phase timer
-    phase_start_time = time.time()
-    
-    # Validate files
-    if not _validate_uploaded_files(uploaded_files):
-        return None
-    
-    # Create progress indicators
-    progress_placeholder, status_placeholder, dashboard_placeholder, status_text = _create_progress_indicators()
-    
-    # Load theme dictionary
-    GAME_THEMES = _load_game_themes(themes_file, status_text)
-    if not GAME_THEMES:
-        return None
-    
-    # Create a temporary directory to store uploaded files
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Process and validate files
-        valid_files, skipped_files, game_name_mapping = _process_and_validate_files(
-            uploaded_files, temp_dir, GAME_THEMES, status_text
-        )
+        client = Client(cluster)
         
-        # Check if we have any valid files
-        if not valid_files:
-            st.error("No valid files to process. All uploaded files' app IDs were not found in the theme dictionary.")
-            return None
+        # Initialize Dask monitor
+        monitor = DaskMonitor(client)
         
-        status_text.write(f"Starting processing with {len(valid_files)} valid files...")
+        # Display dashboard link
+        dashboard_link = client.dashboard_link
+        with dashboard_placeholder.container():
+            st.success("✅ Dask Cluster Ready")
+            st.markdown(f"**[Open Dashboard]({dashboard_link})**")
+            st.caption("Real-time monitoring")
         
-        # Dynamic resource allocation
-        resources = get_system_resources()
-        status_text.write(f"System has {resources['total_memory']:.1f}GB memory and {resources['worker_count']} CPU cores")
-        status_text.write(f"Allocating {resources['worker_count']} workers with {resources['memory_per_worker']}GB each")
+        # Initialize embedder and publish to workers
+        status_text.write(f"Initializing sentence embedder: {SENTENCE_TRANSFORMER_MODEL}")
         
-        # Use try/finally to ensure proper cleanup of Dask resources
-        cluster = None
-        client = None
+        # Check if GPU is available
+        device = 'cuda' if torch.cuda.is_available() and config['use_gpu'] else 'cpu'
+        embedder = SentenceTransformer(SENTENCE_TRANSFORMER_MODEL, device=device)
         
-        try:
-            # Setup Dask cluster
-            cluster, client = _setup_dask_cluster(resources, status_text, dashboard_placeholder)
-            dashboard_link = client.dashboard_link
+        # Ensure model is on CPU before publishing (for serialization)
+        embedder.to('cpu')
+        for param in embedder.parameters():
+            if hasattr(param, 'data'):
+                param.data = param.data.cpu()
+        
+        # Publish embedder to all workers
+        model_dataset_name = f"embedder_{int(time.time())}"
+        client.publish_dataset(embedder, name=model_dataset_name)
+        status_text.write(f"✅ Published embedder to {config['n_workers']} workers")
+        
+        # Process uploaded files
+        with tempfile.TemporaryDirectory() as upload_temp_dir:
+            valid_files = []
+            skipped_files = []
+            game_name_mapping = {}
             
-            # Initialize embedder
-            model_dataset_name = _initialize_embedder(client, status_text)
+            # Validate files
+            for uploaded_file in uploaded_files:
+                file_path = os.path.join(upload_temp_dir, uploaded_file.name)
+                
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                
+                app_id, game_name = extract_appid_and_name_from_parquet(file_path)
+                
+                if app_id and app_id in GAME_THEMES:
+                    valid_files.append((file_path, app_id))
+                    if game_name:
+                        game_name_mapping[app_id] = game_name
+                    status_text.write(f"✅ File '{uploaded_file.name}' has app ID {app_id} - Processing")
+                else:
+                    skipped_files.append((uploaded_file.name, app_id))
+                    status_text.write(f"⚠️ File '{uploaded_file.name}' has app ID {app_id} - Skipping")
             
-            # Read and filter files
-            all_ddfs, total_rows = _read_and_filter_files(valid_files, status_text)
+            if not valid_files:
+                st.error("No valid files to process.")
+                return None
+            
+            # Create all chunks from all files
+            status_text.write("Creating processing chunks...")
+            all_chunks = []
+            chunk_id_counter = 0
+            
+            for file_path, app_id in valid_files:
+                file_chunks = create_file_chunks(file_path, app_id, config['chunk_size'])
+                
+                # Add unique chunk IDs
+                for start, end, fp, aid in file_chunks:
+                    all_chunks.append((start, end, fp, aid, f"chunk_{chunk_id_counter}"))
+                    chunk_id_counter += 1
+            
+            total_chunks = len(all_chunks)
+            status_text.write(f"Created {total_chunks} chunks for parallel processing")
+            
+            # Create progress tracker
+            tracker = create_progress_tracker(total_chunks, progress_placeholder)
+            
+            # Create delayed tasks
+            delayed_tasks = []
+            task_times = {}  # Track task submission times
+            
+            for start, end, file_path, app_id, chunk_id in all_chunks:
+                # Load chunk data
+                chunk_data = load_chunk_data((start, end, file_path, app_id))
+                
+                # Create delayed task
+                task = process_chunk_delayed(
+                    chunk_data, chunk_id, app_id, 
+                    GAME_THEMES, model_dataset_name, temp_paths
+                )
+                delayed_tasks.append(task)
+                task_times[chunk_id] = time.time()
+            
+            # Submit all tasks to cluster
+            tracker['status_text'].write(f"Submitting {len(delayed_tasks)} tasks to Dask cluster...")
+            futures = client.compute(delayed_tasks)
+            
+            # Map futures to chunk IDs for tracking
+            future_to_chunk = {futures[i]: all_chunks[i][4] for i in range(len(futures))}
+            
+            # Track progress
+            completed = 0
+            total_rows_processed = 0
+            
+            # Process results as they complete
+            for future in as_completed(futures):
+                chunk_id = future_to_chunk[future]
+                task_start_time = task_times.get(chunk_id, time.time())
+                
+                # Get result
+                result = future.result()
+                completed += 1
+                total_rows_processed += result['processed_rows']
+                
+                # Log task completion
+                task_duration = time.time() - task_start_time
+                monitor.log_task_completion(chunk_id, task_duration, result['processed_rows'])
+                
+                # Update progress tracker
+                update_progress_tracker(tracker, completed, total_chunks, 
+                                      total_rows_processed, monitor)
+                
+                # Update cluster metrics periodically
+                if completed % 5 == 0:
+                    monitor.display_cluster_metrics(metrics_placeholder)
+                
+                # Periodic memory cleanup
+                if completed % 10 == 0:
+                    gc.collect()
             
             # Store total rows in session state
-            st.session_state["total_rows"] = total_rows
-            if st.session_state.get("total_rows") is not None:
-                st.sidebar.markdown("---")
-                st.sidebar.markdown(f"**Total Reviews:** {st.session_state['total_rows']}")
+            st.session_state["total_rows"] = total_rows_processed
             
-            # Combine all dataframes
-            if not all_ddfs:
-                st.error("No data to process after filtering. Please check your files.")
+            # Final update
+            update_progress_tracker(tracker, completed, total_chunks, 
+                                  total_rows_processed, monitor)
+            
+            # Display final cluster metrics
+            monitor.display_cluster_metrics(metrics_placeholder)
+            
+            # Aggregate all results
+            tracker['status_text'].write("Aggregating chunk results...")
+            final_report = aggregate_temp_results(temp_paths, GAME_THEMES, game_name_mapping)
+            
+            if final_report.empty:
+                st.error("No data after processing.")
                 return None
             
-            status_text.write("Combining all valid data for processing...")
-            combined_ddf = dd.concat(all_ddfs)
-            
-            # Apply topic assignment
-            ddf_with_topic = _apply_topic_assignment(combined_ddf, GAME_THEMES, model_dataset_name, status_text)
-            
-            # Get unique app IDs
-            unique_app_ids = combined_ddf['steam_appid'].unique().compute()
-            total_app_ids = len(unique_app_ids)
-            
-            # Determine batch size
-            batch_size = _determine_batch_size(total_app_ids)
-            status_text.write(f"Processing {total_app_ids} unique app IDs with batch size {batch_size}")
-            
-            # Process app IDs in batches
-            agg_df, positive_reviews_df, negative_reviews_df = _process_app_ids_in_batches(
-                unique_app_ids, ddf_with_topic, batch_size, status_text
-            )
-            
-            # Check if we have any data
-            if agg_df.empty:
-                st.error("No data after processing. Please check your files and filters.")
-                return None
-            
-            # Merge results
-            report_df = _merge_results(agg_df, positive_reviews_df, negative_reviews_df)
-            
-            # Build final report
-            status_text.write("Building final report with sentiment analysis...")
-            final_report = _build_final_report(report_df, GAME_THEMES)
-            
-            # Save intermediate results
+            # Save final report
             final_report.to_csv(DEFAULT_INTERIM_PATH, index=False)
-            status_text.write(f"✅ Saved sentiment report to {DEFAULT_INTERIM_PATH}")
+            tracker['status_text'].write(f"✅ Saved sentiment report to {DEFAULT_INTERIM_PATH}")
+            
+            # Display performance summary
+            display_performance_summary(monitor, status_placeholder)
             
             # Calculate elapsed time
             phase_elapsed_time = time.time() - phase_start_time
             formatted_time = str(datetime.timedelta(seconds=int(phase_elapsed_time)))
             
-            status_text.write(f"✅ Data processing complete! Total processing time: {formatted_time}")
+            # Final success message
+            st.success(
+                f"✅ **Data Processing Complete!**\n\n"
+                f"- Total time: {formatted_time}\n"
+                f"- Processed: {total_rows_processed:,} reviews\n"
+                f"- Parallel chunks: {total_chunks}\n"
+                f"- Workers used: {config['n_workers']}"
+            )
             
             # Return results
             return {
                 'final_report': final_report,
                 'valid_files': valid_files,
                 'skipped_files': skipped_files,
-                'dashboard_link': dashboard_link,
                 'processing_time': phase_elapsed_time,
-                'game_name_mapping': game_name_mapping
+                'game_name_mapping': game_name_mapping,
+                'total_rows': total_rows_processed,
+                'dashboard_link': dashboard_link,
+                'performance_summary': monitor.get_performance_summary()
             }
             
-        finally:
-            # Ensure resources are cleaned up properly
-            if client:
-                client.close()
-            if cluster:
-                cluster.close()
+    except Exception as e:
+        st.error(f"Error during processing: {str(e)}")
+        import traceback
+        st.error(f"Traceback: {traceback.format_exc()}")
+        return None
+        
+    finally:
+        # Clean up
+        cleanup_temp_storage(temp_paths)
+        if client:
+            client.close()
+        if cluster:
+            cluster.close()
+
+
+# Helper functions remain the same
+def create_temp_storage() -> Dict[str, str]:
+    """Create temporary directory structure for intermediate results"""
+    TEMP_DIR_PREFIX = "steamlens_tem_dir_"
+    temp_base = tempfile.mkdtemp(prefix=TEMP_DIR_PREFIX)
+    
+    paths = {
+        'base': temp_base,
+        'aggregations': os.path.join(temp_base, 'aggregations'),
+        'positive_reviews': os.path.join(temp_base, 'positive_reviews'),
+        'negative_reviews': os.path.join(temp_base, 'negative_reviews'),
+        'metadata': os.path.join(temp_base, 'metadata')
+    }
+    
+    for path in paths.values():
+        if path != temp_base:
+            os.makedirs(path, exist_ok=True)
+    
+    return paths
+
+
+def cleanup_temp_storage(temp_paths: Dict[str, str]) -> None:
+    """Clean up temporary storage"""
+    try:
+        shutil.rmtree(temp_paths['base'])
+    except Exception as e:
+        st.warning(f"Could not clean up temporary files: {str(e)}")
+
+
+@dask.delayed
+def process_chunk_delayed(chunk_df: pd.DataFrame, chunk_id: str, app_id: int, 
+                         GAME_THEMES: Dict, model_dataset_name: str,
+                         temp_paths: Dict[str, str]) -> Dict[str, Any]:
+    """Process a single chunk using Dask delayed - runs on worker"""
+    from dask.distributed import get_worker
+    
+    # Get the embedder from the published dataset
+    worker = get_worker()
+    embedder = worker.client.get_dataset(model_dataset_name)
+    
+    # Assign topics to the chunk
+    chunk_with_topics = assign_topic(chunk_df, GAME_THEMES, embedder)
+    
+    # Prepare aggregation data
+    agg_data = []
+    topic_ids = chunk_with_topics['topic_id'].unique()
+    
+    for topic_id in topic_ids:
+        topic_df = chunk_with_topics[chunk_with_topics['topic_id'] == topic_id]
+        
+        # Basic metrics
+        review_count = len(topic_df)
+        likes_sum = topic_df['voted_up'].sum()
+        dislikes_sum = review_count - likes_sum
+        
+        agg_data.append({
+            'steam_appid': app_id,
+            'topic_id': topic_id,
+            'review_count': review_count,
+            'likes_sum': likes_sum,
+            'dislikes_sum': dislikes_sum
+        })
+        
+        # Save positive reviews
+        positive_reviews = topic_df[topic_df['voted_up']]['review'].tolist()
+        if positive_reviews:
+            pos_file = os.path.join(temp_paths['positive_reviews'], 
+                                    f"chunk_{chunk_id}_app_{app_id}_topic_{topic_id}.parquet")
+            pd.DataFrame({
+                'steam_appid': app_id,
+                'topic_id': topic_id,
+                'reviews': [positive_reviews]
+            }).to_parquet(pos_file, compression='snappy')
+        
+        # Save negative reviews
+        negative_reviews = topic_df[~topic_df['voted_up']]['review'].tolist()
+        if negative_reviews:
+            neg_file = os.path.join(temp_paths['negative_reviews'], 
+                                    f"chunk_{chunk_id}_app_{app_id}_topic_{topic_id}.parquet")
+            pd.DataFrame({
+                'steam_appid': app_id,
+                'topic_id': topic_id,
+                'reviews': [negative_reviews]
+            }).to_parquet(neg_file, compression='snappy')
+    
+    # Save aggregation data
+    if agg_data:
+        agg_file = os.path.join(temp_paths['aggregations'], f"chunk_{chunk_id}_app_{app_id}.parquet")
+        pd.DataFrame(agg_data).to_parquet(agg_file, compression='snappy')
+    
+    # Clear memory
+    del chunk_with_topics
+    gc.collect()
+    
+    return {
+        'chunk_id': chunk_id,
+        'processed_rows': len(chunk_df),
+        'topics_found': len(topic_ids),
+        'app_id': app_id
+    }
+
+
+# Include other helper functions from the original refactored version
+def create_file_chunks(file_path: str, app_id: int, chunk_size: int) -> List[Tuple[int, int, str, int]]:
+    """Create chunk boundaries for a file without loading all data"""
+    # Read just to get row count
+    df_info = pd.read_parquet(file_path, columns=['steam_appid', 'review_language'])
+    df_filtered = df_info[(df_info['review_language'] == DEFAULT_LANGUAGE) & 
+                         (df_info['steam_appid'] == app_id)]
+    total_rows = len(df_filtered)
+    del df_info, df_filtered
+    gc.collect()
+    
+    # Create chunk boundaries
+    chunks = []
+    for start in range(0, total_rows, chunk_size):
+        end = min(start + chunk_size, total_rows)
+        chunks.append((start, end, file_path, app_id))
+    
+    return chunks
+
+
+def load_chunk_data(chunk_info: Tuple[int, int, str, int]) -> pd.DataFrame:
+    """Load a specific chunk of data from file"""
+    start, end, file_path, app_id = chunk_info
+    
+    # Read the full file
+    df = pd.read_parquet(file_path, columns=PARQUET_COLUMNS)
+    
+    # Filter and get chunk
+    df_filtered = df[(df['review_language'] == DEFAULT_LANGUAGE) & 
+                    (df['steam_appid'] == app_id)]
+    
+    chunk = df_filtered.iloc[start:end].copy()
+    
+    # Clean up
+    del df, df_filtered
+    gc.collect()
+    
+    return chunk
+
+
+def aggregate_temp_results(temp_paths: Dict[str, str], GAME_THEMES: Dict,
+                          game_name_mapping: Dict[int, str]) -> pd.DataFrame:
+    """Aggregate all temporary results into final report"""
+    # Read all aggregation files
+    agg_files = list(Path(temp_paths['aggregations']).glob('*.parquet'))
+    
+    if not agg_files:
+        return pd.DataFrame()
+    
+    # Combine aggregation data
+    all_aggs = []
+    for agg_file in agg_files:
+        all_aggs.append(pd.read_parquet(agg_file))
+    
+    agg_df = pd.concat(all_aggs)
+    
+    # Group by app_id and topic_id to combine counts
+    final_agg = agg_df.groupby(['steam_appid', 'topic_id']).agg({
+        'review_count': 'sum',
+        'likes_sum': 'sum',
+        'dislikes_sum': 'sum'
+    }).reset_index()
+    
+    # Collect positive reviews
+    positive_reviews_dict = {}
+    pos_files = list(Path(temp_paths['positive_reviews']).glob('*.parquet'))
+    
+    for pos_file in pos_files:
+        df = pd.read_parquet(pos_file)
+        for _, row in df.iterrows():
+            key = (row['steam_appid'], row['topic_id'])
+            if key not in positive_reviews_dict:
+                positive_reviews_dict[key] = []
+            positive_reviews_dict[key].extend(row['reviews'])
+    
+    # Collect negative reviews
+    negative_reviews_dict = {}
+    neg_files = list(Path(temp_paths['negative_reviews']).glob('*.parquet'))
+    
+    for neg_file in neg_files:
+        df = pd.read_parquet(neg_file)
+        for _, row in df.iterrows():
+            key = (row['steam_appid'], row['topic_id'])
+            if key not in negative_reviews_dict:
+                negative_reviews_dict[key] = []
+            negative_reviews_dict[key].extend(row['reviews'])
+    
+    # Build final report
+    final_rows = []
+    
+    for _, row in final_agg.iterrows():
+        app_id = int(row['steam_appid'])
+        topic_id = int(row['topic_id'])
+        
+        # Get theme name
+        if app_id in GAME_THEMES:
+            theme_keys = list(GAME_THEMES[app_id].keys())
+            theme_name = theme_keys[topic_id] if topic_id < len(theme_keys) else f"Unknown Theme {topic_id}"
+        else:
+            theme_name = f"Unknown Theme {topic_id}"
+        
+        # Calculate ratios
+        total = row['review_count']
+        if total > 0:
+            like_ratio = f"{(row['likes_sum'] / total * 100):.1f}%"
+            dislike_ratio = f"{(row['dislikes_sum'] / total * 100):.1f}%"
+        else:
+            like_ratio = "0.0%"
+            dislike_ratio = "0.0%"
+        
+        # Get reviews
+        key = (app_id, topic_id)
+        positive_reviews = positive_reviews_dict.get(key, [])
+        negative_reviews = negative_reviews_dict.get(key, [])
+        
+        final_rows.append({
+            'steam_appid': app_id,
+            'Theme': theme_name,
+            '#Reviews': int(total),
+            'Positive': int(row['likes_sum']),
+            'Negative': int(row['dislikes_sum']),
+            'LikeRatio': like_ratio,
+            'DislikeRatio': dislike_ratio,
+            'Positive_Reviews': positive_reviews,
+            'Negative_Reviews': negative_reviews
+        })
+    
+    return pd.DataFrame(final_rows)
