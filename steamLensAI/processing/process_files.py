@@ -214,16 +214,21 @@ def process_uploaded_files(uploaded_files: List[Any], themes_file: str = "game_t
             task_times = {}  # Track task submission times
             
             for start, end, file_path, app_id, chunk_id in all_chunks:
-                # Load chunk data
-                chunk_data = load_chunk_data((start, end, file_path, app_id))
-                
-                # Create delayed task
-                task = process_chunk_delayed(
-                    chunk_data, chunk_id, app_id, 
-                    GAME_THEMES, model_dataset_name, temp_paths
+                #schedule teh load itself on workers
+                chunk_delayed = delayed(load_chunk_data)((start, end, file_path, app_id))
+ 
+                #now schedule the processing (load + topic assignment) as one task
+                task  = process_chunk_delayed(
+                    chunk_delayed, 
+                    chunk_id,
+                    app_id,
+                    GAME_THEMES,
+                    model_dataset_name,
+                    temp_paths
                 )
                 delayed_tasks.append(task)
                 task_times[chunk_id] = time.time()
+
             
             # Submit all tasks to cluster
             tracker['status_text'].write(f"Submitting {len(delayed_tasks)} tasks to Dask cluster...")
