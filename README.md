@@ -23,7 +23,7 @@ Summarization (Heirarchical Summarization) based on the now categorized data fro
  > 1.2M reviews in 8 minutes
 
 The following are the Execution Time Metrics for the above mentioned data:
-![execution_metrics](execution_metrics.png)
+![execution_metrics](images/execution_metrics.png)
 
 The core innovation lies in its **distributed computing approach** where multiple worker processes share a single GPU through intelligent model distribution, achieving maximum hardware utilization while maintaining processing efficiency.
 
