@@ -291,7 +291,9 @@ Other: All other specifications configurable via app_config.py
 - I/O-bound: Depends on storage speed (biggest challenge as chunking requires multiple IO reads which can't be parallelized)
 ```
 The followin are terminal images showing multiple models being loaded in the GPU at the same time:
+Terminal for topic assignmnet
 ![terminal_execs_topic_assignment](images/topic_assignment_exe.png)
+Terminal for summarization
 ![terminal_execs_summarization](images/summarization_exe.png)
 ## Configuration Management
 
@@ -330,7 +332,9 @@ else:
 
 ---
 ## Outputs:
+topic assignment output
 ![ui_output_topic_assignment](images/topic_assignment_ui.png)
+summarization output
 ![ui_summarization](images/summarization_ui.png)
 
 ## Results:
