@@ -114,20 +114,19 @@ Uploaded Files → Temporary Storage → App ID Extraction → Theme Validation
 └─────────────────┘  │
                      │
                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Dask LocalCluster                           │
-│                                                             │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│  │  Worker 1   │ │  Worker 2   │ │  Worker 3   │ │  Worker 4   │
-│  │             │ │             │ │             │ │             │
-│  │ • Get Model │ │ • Get Model │ │ • Get Model │ │ • Get Model │
-│  │ • Process   │ │ • Process   │ │ • Process   │ │ • Process   │
-│  │   Chunk A   │ │   Chunk B   │ │   Chunk C   │ │   Chunk D   │
-│  │ • Save      │ │ • Save      │ │ • Save      │ │ • Save      │
-│  │   Results   │ │   Results   │ │   Results   │ │   Results   │
-│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
-│                                  │                      │
-└──────────────────────────────────┼──────────────────────┘
+┌───────────────────────────────────────────────────────────────────┐
+│                 Dask LocalCluster                                 │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐  │
+│  │  Worker 1   │ │  Worker 2   │ │  Worker 3   │ │  Worker 4   │  │
+│  │             │ │             │ │             │ │             │  │
+│  │ • Get Model │ │ • Get Model │ │ • Get Model │ │ • Get Model │  │
+│  │ • Process   │ │ • Process   │ │ • Process   │ │ • Process   │  │
+│  │   Chunk A   │ │   Chunk B   │ │   Chunk C   │ │   Chunk D   │  │
+│  │ • Save      │ │ • Save      │ │ • Save      │ │ • Save      │  │
+│  │   Results   │ │   Results   │ │   Results   │ │   Results   │  │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘  │
+│                                  │                                │
+└──────────────────────────────────┼────────────────────────────────┘
                                    │
                                    ▼
                             ┌─────────────┐
