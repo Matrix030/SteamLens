@@ -8,7 +8,7 @@
  ║ ╚══════╝   ╚═╝   ╚══════╝╚═╝ ╚═╝ ╚═╝    ╚═╝╚══════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝ ║
  ╚═══════════════════════════════════════════════════════════════════════════════════════════╝
 ```
-since 90% of you are here to see the architecture, here it is...
+since 90% of you are here to see the architecture, I've removed the previous readme of the application for a detailed architecture, here it is...
 # steamLensAI Architecture Documentation
 
 This document explains the technical architecture, distributed processing design, and engineering decisions behind steamLensAI's high-performance Steam review analysis system.
