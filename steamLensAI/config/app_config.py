@@ -61,7 +61,7 @@ else:
     }
 
 # Default hardware configuration for summarization (optimized for your system)
-if SYSTEM_MEMORY_GB >= 32 and GPU_MEMORY_GB >= 16:
+if SYSTEM_MEMORY_GB >= 30 and GPU_MEMORY_GB >= 15.5:
     # Optimized for your 32GB RAM + 16GB VRAM system
     HARDWARE_CONFIG = {
         'worker_count': 8,  # More workers for 32GB system
@@ -78,8 +78,8 @@ if SYSTEM_MEMORY_GB >= 32 and GPU_MEMORY_GB >= 16:
 elif SYSTEM_MEMORY_GB >= 16:
     # Configuration for mid-range systems
     HARDWARE_CONFIG = {
-        'worker_count': 4,
-        'memory_per_worker': '3GB',
+        'worker_count': 8,
+        'memory_per_worker': '4GB',
         'gpu_batch_size': 256,
         'model_name': 'sshleifer/distilbart-cnn-12-6',
         'chunk_size': 600,
